@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vi-slides 簡報組合器</title>
+<style>
+* { box-sizing: border-box; }
+body { font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    max-width: 720px; margin: 0 auto; padding: 1.5em 1em; background: #f8fafb; color: #1a1a1a; }
+h1 { font-size: 1.4em; color: #1b5e20; margin-bottom: .1em; }
+.subtitle { color: #666; font-size: .9em; margin-bottom: 1.5em; }
+.group { background: #fff; border-radius: 8px; padding: 1em 1.2em; margin-bottom: 1em;
+    border-left: 4px solid #2e7d32; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.group h2 { font-size: 1em; color: #2e7d32; margin: 0 0 .6em; }
+.group.addon { border-color: #4527a0; }
+.group.addon h2 { color: #4527a0; }
+label { display: flex; align-items: flex-start; gap: .6em; padding: .35em 0;
+    cursor: pointer; font-size: .92em; line-height: 1.4; }
+label input[type=checkbox] { margin-top: .2em; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer; }
+.mod-desc { color: #666; font-size: .82em; }
+.actions { display: flex; gap: .8em; margin-top: 1.5em; flex-wrap: wrap; }
+button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer;
+    font-size: .95em; font-family: inherit; }
+#btn-preview { background: #1565c0; color: #fff; }
+#btn-preview:hover { background: #0d47a1; }
+#btn-copy { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+#btn-copy:hover { background: #c8e6c9; }
+#status { font-size: .85em; color: #555; padding: .4em 0; }
+</style>
+</head>
+<body>
+<h1>vi-slides 簡報組合器</h1>
+<p class="subtitle">勾選要放入的模組，按「預覽簡報」直接開啟，或複製連結分享講義。</p>
+
+<div class="group" id="group-vitools">
+    <h2>vi-tools 工具</h2>
+    <!-- 模組列表由 JS 從 MODULES 產生 -->
+</div>
+
+<div class="group addon" id="group-nvda">
+    <h2>NVDA 附加元件</h2>
+</div>
+
+<div class="group" id="group-common">
+    <h2>共用頁面</h2>
+</div>
+
+<div class="actions">
+    <button id="btn-preview">預覽簡報</button>
+    <button id="btn-copy">複製分享連結</button>
+    <span id="status"></span>
+</div>
+
+<script>
+// ── 所有可用模組 ──────────────────────────────────────────
+const MODULES = [
+    // vi-tools 工具
+    { id: 'title',             group: 'vitools', name: '標題頁',            desc: '講者資訊與活動名稱（每份簡報都應包含）' },
+    { id: 'vi-tools-overview', group: 'vitools', name: 'vi-tools 概覽',     desc: '五個工具一覽卡片' },
+    { id: 'bt-detail',         group: 'vitools', name: '文字轉點字（詳細）', desc: '功能與適用情境' },
+    { id: 'b2t-detail',        group: 'vitools', name: '點字轉文字（詳細）', desc: '功能與適用情境' },
+    { id: 'math-detail',       group: 'vitools', name: '數學點字（詳細）',   desc: '功能與適用情境' },
+    { id: 'doc-detail',        group: 'vitools', name: '文件整理（詳細）',   desc: '功能與適用情境' },
+    { id: 'query-detail',      group: 'vitools', name: 'UEB 查詢（詳細）',   desc: '功能與適用情境' },
+    { id: 'proofing',          group: 'vitools', name: '雙視校對與存檔',     desc: '跨裝置工作流程說明' },
+    // NVDA 附加元件
+    { id: 'nvda-overview',     group: 'nvda', name: 'NVDA 附加元件概覽',  desc: '五個附加元件一覽' },
+    { id: 'braille-table',     group: 'nvda', name: '點字表切換',          desc: '快捷鍵與切換順序' },
+    { id: '6d-ime',            group: 'nvda', name: '六點輸入法',          desc: '快捷鍵、模式、六鍵對應' },
+    { id: 'dict-switcher',     group: 'nvda', name: '語音字典切換',        desc: '快捷鍵與各字典說明' },
+    { id: 'zh-dict',           group: 'nvda', name: '國語字典查詢',        desc: '快捷鍵與查詢結果' },
+    { id: 'braille-export',    group: 'nvda', name: '點字輸出匯出',        desc: '快捷鍵、輸出格式、適用情境' },
+    // 共用
+    { id: 'closing',           group: 'common', name: '結尾頁',           desc: '網址與開源資訊' },
+];
+
+// ── 建立勾選介面 ──────────────────────────────────────────
+const groupEls = {
+    vitools: document.getElementById('group-vitools'),
+    nvda:    document.getElementById('group-nvda'),
+    common:  document.getElementById('group-common'),
+};
+MODULES.forEach(m => {
+    const label = document.createElement('label');
+    label.innerHTML = `<input type="checkbox" name="mod" value="${m.id}">
+        <span><strong>${m.name}</strong><br><span class="mod-desc">${m.desc}</span></span>`;
+    groupEls[m.group].appendChild(label);
+});
+
+// ── 從 URL hash 還原勾選狀態 ─────────────────────────────
+function getSelected() {
+    return Array.from(document.querySelectorAll('input[name=mod]:checked')).map(el => el.value);
+}
+function buildUrl(selected) {
+    const base = location.href.split('?')[0].replace('compose.html', 'preview.html');
+    return base + '?m=' + selected.join(',');
+}
+function restoreFromUrl() {
+    const params = new URLSearchParams(location.search);
+    const ids = (params.get('m') || '').split(',').filter(Boolean);
+    ids.forEach(id => {
+        const cb = document.querySelector(`input[value="${id}"]`);
+        if (cb) cb.checked = true;
+    });
+}
+restoreFromUrl();
+
+// ── 按鈕邏輯 ────────────────────────────────────────────
+document.getElementById('btn-preview').addEventListener('click', () => {
+    const sel = getSelected();
+    if (!sel.length) { document.getElementById('status').textContent = '請至少勾選一個模組'; return; }
+    window.open(buildUrl(sel), '_blank');
+});
+
+document.getElementById('btn-copy').addEventListener('click', () => {
+    const sel = getSelected();
+    if (!sel.length) { document.getElementById('status').textContent = '請至少勾選一個模組'; return; }
+    navigator.clipboard.writeText(buildUrl(sel)).then(() => {
+        document.getElementById('status').textContent = '連結已複製！';
+        setTimeout(() => { document.getElementById('status').textContent = ''; }, 2500);
+    });
+});
+
+// 勾選變動時更新瀏覽器 URL（可隨時書籤）
+document.querySelectorAll('input[name=mod]').forEach(cb => {
+    cb.addEventListener('change', () => {
+        const sel = getSelected();
+        const newUrl = sel.length ? '?m=' + sel.join(',') : location.pathname.split('/').pop();
+        history.replaceState(null, '', newUrl);
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>簡報預覽</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.css">
+<link rel="stylesheet" href="shared/slides-core.css">
+</head>
+<body>
+
+<nav aria-label="簡報操作說明" class="sr-only">
+    <p>這是一份投影片簡報。若使用螢幕閱讀器，建議按右上角「切換閱讀版」按鈕以一般網頁方式閱讀。</p>
+</nav>
+<div id="a11y-live" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+<button id="toggle-reading" aria-pressed="false">切換閱讀版</button>
+
+<div class="reveal">
+    <div class="slides" role="main" id="slide-container">
+        <section><p style="padding:2em;color:#999">載入中…</p></section>
+    </div>
+</div>
+
+<article id="reading-view" hidden tabindex="-1" lang="zh-TW" aria-label="簡報閱讀版"></article>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+<script src="shared/slides-core.js"></script>
+<script>
+// 從 URL ?m= 參數取得模組清單，fetch 後組裝
+const params  = new URLSearchParams(location.search);
+const modIds  = (params.get('m') || '').split(',').filter(Boolean);
+
+if (!modIds.length) {
+    document.getElementById('slide-container').innerHTML =
+        '<section><p style="padding:2em">請從 <a href="compose.html">compose.html</a> 選擇模組。</p></section>';
+    boot([]);
+} else {
+    Promise.all(modIds.map(id =>
+        fetch('modules/' + id + '.html').then(r => r.ok ? r.text() : '')
+    )).then(htmls => {
+        const slideHtml = htmls.join('\n');
+        document.getElementById('slide-container').innerHTML = slideHtml;
+
+        // 同步建立閱讀版
+        const rv = document.getElementById('reading-view');
+        const sections = document.querySelectorAll('#slide-container section[data-rv]');
+        sections.forEach(sec => {
+            const clone = document.createElement('section');
+            clone.setAttribute('aria-label', sec.getAttribute('data-rv-label') || '');
+            clone.innerHTML = sec.getAttribute('data-rv') || sec.innerHTML;
+            rv.appendChild(clone);
+        });
+
+        boot(htmls);
+    });
+}
+
+function boot() {
+    Reveal.initialize({
+        hash: false,
+        slideNumber: 'c/t',
+        transition: 'fade',
+        transitionSpeed: 'fast',
+        controls: true,
+        progress: true,
+        center: false,
+        margin: 0.04,
+        width: 1024,
+        height: 720,
+    }).then(() => initSlides());
+}
+</script>
+</body>
+</html>
