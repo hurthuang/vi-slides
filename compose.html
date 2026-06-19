@@ -55,6 +55,13 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
     </div>
 </div>
 
+<div class="group" id="group-ueb" style="border-color:#00695c">
+    <div class="group-header">
+        <h2 style="color:#00695c">UEB 規則介紹</h2>
+        <label class="select-all-label"><input type="checkbox" id="sa-ueb"> 全選</label>
+    </div>
+</div>
+
 <div class="group" id="group-common">
     <div class="group-header">
         <h2>共用頁面</h2>
@@ -89,6 +96,16 @@ const MODULES = [
     { id: 'dict-switcher',     group: 'nvda', name: '語音字典切換',        desc: '快捷鍵與各字典說明' },
     { id: 'zh-dict',           group: 'nvda', name: '國語字典查詢',        desc: '快捷鍵與查詢結果' },
     { id: 'braille-export',    group: 'nvda', name: '點字輸出匯出',        desc: '快捷鍵、輸出格式、適用情境' },
+    // UEB 規則介紹
+    { id: 'ueb-intro',              group: 'ueb', name: 'UEB 開始之前',              desc: '學習策略與背景概念' },
+    { id: 'ueb-types',              group: 'ueb', name: 'UEB 縮寫類型概覽',          desc: '七大類型簡介' },
+    { id: 'ueb-shortform',          group: 'ueb', name: 'Shortform',                desc: '部份字母縮寫，含完整列表（47 個）' },
+    { id: 'ueb-wordsigns',          group: 'ueb', name: 'Alphabetic Wordsigns',     desc: '字母代表單字，含完整列表（23 個）' },
+    { id: 'ueb-strong-contraction', group: 'ueb', name: 'Strong Contraction',       desc: 'and/for/of/the/with，字中優先縮寫' },
+    { id: 'ueb-strong-groupsign',   group: 'ueb', name: 'Strong Groupsigns',        desc: 'ch/sh/th/wh/ou/st/ed/er/ing/ar/ow/gh' },
+    { id: 'ueb-lower-groupsign',    group: 'ueb', name: 'Lower Groupsigns',         desc: '下位字根，位置不同意義不同' },
+    { id: 'ueb-initial-final',      group: 'ueb', name: 'Initial/Final Contractions', desc: '5 種前置符號的字首與字尾縮寫' },
+    { id: 'ueb-punctuation',        group: 'ueb', name: '標點符號',                  desc: 'UEB 常用標點點字對照' },
     // 共用
     { id: 'closing',           group: 'common', name: '結尾頁',           desc: '網址與開源資訊' },
 ];
@@ -97,6 +114,7 @@ const MODULES = [
 const groupEls = {
     vitools: document.getElementById('group-vitools'),
     nvda:    document.getElementById('group-nvda'),
+    ueb:     document.getElementById('group-ueb'),
     common:  document.getElementById('group-common'),
 };
 MODULES.forEach(m => {
@@ -107,7 +125,7 @@ MODULES.forEach(m => {
 });
 
 // ── 類別全選邏輯 ─────────────────────────────────────────
-['vitools', 'nvda', 'common'].forEach(grp => {
+['vitools', 'nvda', 'ueb', 'common'].forEach(grp => {
     const sa = document.getElementById('sa-' + grp);
     const boxes = () => document.querySelectorAll(`#group-${grp} input[name=mod]`);
 
@@ -146,7 +164,7 @@ function restoreFromUrl() {
         if (cb) cb.checked = true;
     });
     // 還原後同步全選狀態
-    ['vitools', 'nvda', 'common'].forEach(grp => {
+    ['vitools', 'nvda', 'ueb', 'common'].forEach(grp => {
         const sa = document.getElementById('sa-' + grp);
         const all = Array.from(document.querySelectorAll(`#group-${grp} input[name=mod]`));
         sa.checked = all.every(c => c.checked);
