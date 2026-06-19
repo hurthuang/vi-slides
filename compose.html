@@ -12,9 +12,13 @@ h1 { font-size: 1.4em; color: #1b5e20; margin-bottom: .1em; }
 .subtitle { color: #666; font-size: .9em; margin-bottom: 1.5em; }
 .group { background: #fff; border-radius: 8px; padding: 1em 1.2em; margin-bottom: 1em;
     border-left: 4px solid #2e7d32; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-.group h2 { font-size: 1em; color: #2e7d32; margin: 0 0 .6em; }
+.group-header { display: flex; align-items: center; gap: .7em; margin-bottom: .6em; }
+.group-header h2 { font-size: 1em; color: #2e7d32; margin: 0; }
 .group.addon { border-color: #4527a0; }
-.group.addon h2 { color: #4527a0; }
+.group.addon .group-header h2 { color: #4527a0; }
+.select-all-label { display: flex; align-items: center; gap: .35em;
+    font-size: .82em; color: #555; cursor: pointer; margin-left: auto; }
+.select-all-label input { width: 14px; height: 14px; cursor: pointer; }
 label { display: flex; align-items: flex-start; gap: .6em; padding: .35em 0;
     cursor: pointer; font-size: .92em; line-height: 1.4; }
 label input[type=checkbox] { margin-top: .2em; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer; }
@@ -26,6 +30,10 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 #btn-preview:hover { background: #0d47a1; }
 #btn-copy { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
 #btn-copy:hover { background: #c8e6c9; }
+#btn-pdf { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+#btn-pdf:hover { background: #ffe0b2; }
+.pdf-hint { font-size: .8em; color: #888; margin-top: .9em; padding: .6em .8em;
+    background: #fff8e1; border-radius: 6px; border-left: 3px solid #ffd54f; line-height: 1.5; }
 #status { font-size: .85em; color: #555; padding: .4em 0; }
 </style>
 </head>
@@ -34,23 +42,33 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 <p class="subtitle">勾選要放入的模組，按「預覽簡報」直接開啟，或複製連結分享講義。</p>
 
 <div class="group" id="group-vitools">
-    <h2>vi-tools 工具</h2>
-    <!-- 模組列表由 JS 從 MODULES 產生 -->
+    <div class="group-header">
+        <h2>vi-tools 工具</h2>
+        <label class="select-all-label"><input type="checkbox" id="sa-vitools"> 全選</label>
+    </div>
 </div>
 
 <div class="group addon" id="group-nvda">
-    <h2>NVDA 附加元件</h2>
+    <div class="group-header">
+        <h2>NVDA 附加元件</h2>
+        <label class="select-all-label"><input type="checkbox" id="sa-nvda"> 全選</label>
+    </div>
 </div>
 
 <div class="group" id="group-common">
-    <h2>共用頁面</h2>
+    <div class="group-header">
+        <h2>共用頁面</h2>
+        <label class="select-all-label"><input type="checkbox" id="sa-common"> 全選</label>
+    </div>
 </div>
 
 <div class="actions">
     <button id="btn-preview">預覽簡報</button>
     <button id="btn-copy">複製分享連結</button>
+    <button id="btn-pdf">匯出 PDF</button>
     <span id="status"></span>
 </div>
+<p class="pdf-hint">匯出 PDF：請用 <strong>Chrome 或 Edge</strong> 開啟，列印時選「<strong>另存為 PDF</strong>」、紙張<strong>橫向</strong>、勾選「<strong>背景圖形</strong>」。</p>
 
 <script>
 // ── 所有可用模組 ──────────────────────────────────────────
@@ -88,13 +106,37 @@ MODULES.forEach(m => {
     groupEls[m.group].appendChild(label);
 });
 
-// ── 從 URL hash 還原勾選狀態 ─────────────────────────────
+// ── 類別全選邏輯 ─────────────────────────────────────────
+['vitools', 'nvda', 'common'].forEach(grp => {
+    const sa = document.getElementById('sa-' + grp);
+    const boxes = () => document.querySelectorAll(`#group-${grp} input[name=mod]`);
+
+    sa.addEventListener('change', () => {
+        boxes().forEach(cb => { cb.checked = sa.checked; });
+        syncUrl();
+    });
+    // 子項變動時同步全選狀態
+    groupEls[grp].addEventListener('change', e => {
+        if (e.target.name !== 'mod') return;
+        const all = Array.from(boxes());
+        sa.checked = all.every(c => c.checked);
+        sa.indeterminate = !sa.checked && all.some(c => c.checked);
+        syncUrl();
+    });
+});
+
+// ── 從 URL 還原勾選狀態 ──────────────────────────────────
 function getSelected() {
     return Array.from(document.querySelectorAll('input[name=mod]:checked')).map(el => el.value);
 }
-function buildUrl(selected) {
+function buildPreviewUrl(selected) {
     const base = location.href.split('?')[0].replace('compose.html', 'preview.html');
     return base + '?m=' + selected.join(',');
+}
+function syncUrl() {
+    const sel = getSelected();
+    const newUrl = sel.length ? '?m=' + sel.join(',') : location.pathname.split('/').pop();
+    history.replaceState(null, '', newUrl);
 }
 function restoreFromUrl() {
     const params = new URLSearchParams(location.search);
@@ -103,32 +145,39 @@ function restoreFromUrl() {
         const cb = document.querySelector(`input[value="${id}"]`);
         if (cb) cb.checked = true;
     });
+    // 還原後同步全選狀態
+    ['vitools', 'nvda', 'common'].forEach(grp => {
+        const sa = document.getElementById('sa-' + grp);
+        const all = Array.from(document.querySelectorAll(`#group-${grp} input[name=mod]`));
+        sa.checked = all.every(c => c.checked);
+        sa.indeterminate = !sa.checked && all.some(c => c.checked);
+    });
 }
 restoreFromUrl();
 
 // ── 按鈕邏輯 ────────────────────────────────────────────
+const statusEl = document.getElementById('status');
+function showStatus(msg, ms = 2500) {
+    statusEl.textContent = msg;
+    setTimeout(() => { statusEl.textContent = ''; }, ms);
+}
+
 document.getElementById('btn-preview').addEventListener('click', () => {
     const sel = getSelected();
-    if (!sel.length) { document.getElementById('status').textContent = '請至少勾選一個模組'; return; }
-    window.open(buildUrl(sel), '_blank');
+    if (!sel.length) { showStatus('請至少勾選一個模組'); return; }
+    window.open(buildPreviewUrl(sel), '_blank');
 });
 
 document.getElementById('btn-copy').addEventListener('click', () => {
     const sel = getSelected();
-    if (!sel.length) { document.getElementById('status').textContent = '請至少勾選一個模組'; return; }
-    navigator.clipboard.writeText(buildUrl(sel)).then(() => {
-        document.getElementById('status').textContent = '連結已複製！';
-        setTimeout(() => { document.getElementById('status').textContent = ''; }, 2500);
-    });
+    if (!sel.length) { showStatus('請至少勾選一個模組'); return; }
+    navigator.clipboard.writeText(buildPreviewUrl(sel)).then(() => showStatus('連結已複製！'));
 });
 
-// 勾選變動時更新瀏覽器 URL（可隨時書籤）
-document.querySelectorAll('input[name=mod]').forEach(cb => {
-    cb.addEventListener('change', () => {
-        const sel = getSelected();
-        const newUrl = sel.length ? '?m=' + sel.join(',') : location.pathname.split('/').pop();
-        history.replaceState(null, '', newUrl);
-    });
+document.getElementById('btn-pdf').addEventListener('click', () => {
+    const sel = getSelected();
+    if (!sel.length) { showStatus('請至少勾選一個模組'); return; }
+    window.open(buildPreviewUrl(sel) + '&print-pdf', '_blank');
 });
 </script>
 </body>
