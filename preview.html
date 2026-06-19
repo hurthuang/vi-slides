@@ -17,7 +17,7 @@
 
 <div class="reveal">
     <div class="slides" role="main" id="slide-container">
-        <section><p style="padding:2em;color:#999">載入中…</p></section>
+        <section><p style="padding:2em;color:#999;text-align:center">載入中…</p></section>
     </div>
 </div>
 
@@ -26,32 +26,39 @@
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
 <script src="shared/slides-core.js"></script>
 <script>
-// 從 URL ?m= 參數取得模組清單，fetch 後組裝
-const params  = new URLSearchParams(location.search);
-const modIds  = (params.get('m') || '').split(',').filter(Boolean);
+const params = new URLSearchParams(location.search);
+const modIds = (params.get('m') || '').split(',').filter(Boolean);
+const container = document.getElementById('slide-container');
+const rv = document.getElementById('reading-view');
 
 if (!modIds.length) {
-    document.getElementById('slide-container').innerHTML =
-        '<section><p style="padding:2em">請從 <a href="compose.html">compose.html</a> 選擇模組。</p></section>';
-    boot([]);
+    container.innerHTML = '<section><p style="padding:2em;text-align:center">請從 <a href="compose.html">compose.html</a> 選擇模組。</p></section>';
+    boot();
 } else {
     Promise.all(modIds.map(id =>
-        fetch('modules/' + id + '.html').then(r => r.ok ? r.text() : '')
+        fetch('modules/' + id + '.html')
+            .then(r => r.ok ? r.text() : `<section><p style="color:red">模組 ${id} 載入失敗</p></section>`)
+            .catch(() => `<section><p style="color:red">模組 ${id} 載入失敗</p></section>`)
     )).then(htmls => {
-        const slideHtml = htmls.join('\n');
-        document.getElementById('slide-container').innerHTML = slideHtml;
+        // 組裝投影片
+        container.innerHTML = htmls.join('\n');
 
-        // 同步建立閱讀版
-        const rv = document.getElementById('reading-view');
-        const sections = document.querySelectorAll('#slide-container section[data-rv]');
-        sections.forEach(sec => {
-            const clone = document.createElement('section');
-            clone.setAttribute('aria-label', sec.getAttribute('data-rv-label') || '');
-            clone.innerHTML = sec.getAttribute('data-rv') || sec.innerHTML;
+        // 組裝閱讀版：複製每個 section，動態加頁次標籤與「切換至投影片」連結
+        const slides = Array.from(container.querySelectorAll('section'));
+        slides.forEach((sec, i) => {
+            const clone = sec.cloneNode(true);
+            // 加頁次標籤
+            const label = document.createElement('span');
+            label.className = 'slide-label';
+            label.textContent = `第 ${i + 1} 頁`;
+            clone.insertBefore(label, clone.firstChild);
+            // 複製 aria-label 供 region 導覽
+            const al = sec.getAttribute('aria-label');
+            if (al) clone.setAttribute('aria-label', `第 ${i + 1} 頁：${al.replace(/^第\s*\d+\s*頁[：:]?\s*/, '')}`);
             rv.appendChild(clone);
         });
 
-        boot(htmls);
+        boot();
     });
 }
 

@@ -116,6 +116,48 @@
 .slide-end .gh { margin-top: .5em; font-size: .7em; color: #90caf9; }
 .slide-end .gh a { color: inherit; }
 
+/* ── 閱讀版：覆蓋投影片 layout class，恢復正常文件流 ── */
+#reading-view .two-col,
+#reading-view .tool-grid,
+#reading-view .addon-grid,
+#reading-view .addon-detail { display: block; }
+#reading-view .col-box,
+#reading-view .tool-card,
+#reading-view .addon-card,
+#reading-view .detail-box { background: none; border: none; border-radius: 0; padding: .1em 0; margin-bottom: .5em; }
+#reading-view .tool-card .icon { display: none; }
+#reading-view .tool-card .name { font-size: 1em; font-weight: 700; margin: .2em 0 .1em; }
+#reading-view .addon-card .name { font-size: 1em; font-weight: 700; color: #1a1a1a; margin-bottom: .1em; }
+#reading-view .tool-card .desc,
+#reading-view .addon-card .desc { font-size: .9em; color: #555; }
+#reading-view .slide-cover,
+#reading-view .slide-end { background: none !important; color: #1a1a1a !important; display: block !important; }
+#reading-view .slide-cover h1,
+#reading-view .slide-end h1 { color: #1b5e20 !important; font-size: 1.4em; }
+#reading-view .slide-end p { color: #1a1a1a; }
+#reading-view .presenter { color: #333; border: none; padding: 0; }
+#reading-view .tagline { color: #555; }
+#reading-view .url,
+#reading-view .url-box { background: none; display: inline; padding: 0; border-radius: 0; }
+#reading-view .url a,
+#reading-view .url-box a { color: #1565c0 !important; }
+#reading-view .gh { color: #555; }
+#reading-view .gh a { color: #1565c0; }
+#reading-view .flow { flex-wrap: wrap; gap: 4px; margin: .4em 0; }
+#reading-view .flow-box { font-size: .9em; }
+#reading-view .flow-arr { color: #999; }
+#reading-view .kbd-row { flex-wrap: wrap; }
+#reading-view .kbd-chip { display: inline-flex; margin-bottom: .3em; }
+#reading-view .key-map { display: flex; flex-wrap: wrap; gap: 4px; max-width: 300px; }
+#reading-view .key-cell { padding: 3px 8px; }
+#reading-view .step-list { list-style: decimal; padding-left: 1.5em; display: block; }
+#reading-view .step-list li { font-size: 1em; display: list-item; }
+#reading-view .step-list li::before { display: none; }
+#reading-view .scenario-tag { background: #e3f2fd; color: #1565c0; border-radius: 12px; padding: 1px 8px; font-size: .85em; display: inline-block; margin: 2px; }
+#reading-view .dict-label { display: inline-block; margin-bottom: .3em; padding: 2px 8px; border-radius: 3px; font-weight: 700; font-size: .9em; }
+#reading-view .dict-label.zh { background: #e8f5e9; color: #2e7d32; }
+#reading-view .dict-label.en { background: #e3f2fd; color: #1565c0; }
+
 /* ── 圖片 ── */
 .reveal img { max-width: 100%; border-radius: 6px; }
 .img-caption { font-size: .62em; color: #666; text-align: center; margin-top: .25em; }
