@@ -157,17 +157,14 @@ function initLightbox() {
     const openLB = (src, alt) => { img.src = src; img.alt = alt; overlay.classList.add('open'); };
     const closeLB = () => overlay.classList.remove('open');
 
-    // capture phase: intercept Alt+click on img before RevealZoom sees it
+    // plain click on img → lightbox; Alt+click passes through to RevealZoom
     container.addEventListener('click', e => {
-        if (!e.altKey) return;
+        if (e.altKey) return;
         const t = e.target.closest('img');
         if (!t) return;
-        e.preventDefault();
-        e.stopImmediatePropagation();
         openLB(t.src, t.alt);
-    }, true);
+    });
     overlay.addEventListener('click', closeLB);
-    // capture phase: close lightbox before Reveal.js overview handler fires
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && overlay.classList.contains('open')) {
             closeLB();
@@ -225,6 +222,7 @@ function initTOC() {
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && !panel.hidden) closeTOC();
     });
+    panel.addEventListener('wheel', e => { e.stopPropagation(); });
     Reveal.on('slidechanged', updateCurrent);
 }
 </script>
