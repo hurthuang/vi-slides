@@ -59,7 +59,7 @@
     border-radius: 6px; box-shadow: 0 8px 32px rgba(0,0,0,.5);
     pointer-events: none;
 }
-.reveal .slides img { cursor: zoom-in; }
+.reveal .slides img { cursor: pointer; }
 </style>
 </head>
 <body>
@@ -90,7 +90,6 @@
 <article id="reading-view" hidden tabindex="-1" lang="zh-TW" aria-label="簡報閱讀版"></article>
 
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/zoom/zoom.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/rajgoel/reveal.js-plugins@master/chalkboard/plugin.js"></script>
 <script src="shared/slides-core.js"></script>
 <script>
@@ -140,7 +139,7 @@ function boot() {
         height: 720,
         navigationMode: 'linear',
         mouseWheel: true,
-        plugins: [RevealZoom, RevealChalkboard],
+        plugins: [RevealChalkboard],
         chalkboard: { boardmarkerWidth: 3, chalkEffect: 0.5 },
     }).then(() => {
         initSlides();
