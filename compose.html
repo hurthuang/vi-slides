@@ -138,6 +138,19 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
     <div class="group-content" id="content-common"></div>
 </div>
 
+
+<div class="group" id="group-promo" style="border-color:#0288d1">
+    <div class="group-header" onclick="toggleGroup('promo')">
+        <span class="drag-handle group-drag-handle" aria-hidden="true">⠿</span>
+        <button class="toggle-btn" id="tb-promo" aria-expanded="false">▶</button>
+        <h2 style="color:#0288d1">宣導簡報</h2>
+        <label class="select-all-label" onclick="event.stopPropagation()">
+            <input type="checkbox" id="sa-promo"> 全選
+        </label>
+    </div>
+    <div class="group-content" id="content-promo"></div>
+</div>
+
 </div><!-- #groups-container -->
 
 <div class="actions">
@@ -231,6 +244,19 @@ const MODULES = [
     { id: 'ueb-punctuation',        group: 'ueb', name: '標點符號',                  desc: 'UEB 常用標點點字對照' },
     // 共用
     { id: 'closing', group: 'common', name: '結尾頁', desc: '網址與開源資訊' },
+    // 宣導簡報
+    { id: 'promo-s-ch',       group: 'promo', name: '學生版：認識視覺障礙', desc: '章節標題頁', type: 'chapter' },
+    { id: 'promo-s-intro',    group: 'promo', name: '標題與引言',           desc: '什麼是視覺障礙？引導問題',                     chapter: 'promo-s-ch' },
+    { id: 'promo-s-eye',      group: 'promo', name: '眼疾視覺模擬',         desc: '白內障/青光眼/視網膜病變/黃斑部病變 × 3 組情境', chapter: 'promo-s-ch' },
+    { id: 'promo-s-sensory',  group: 'promo', name: '感官替代管道',         desc: '聽覺/觸覺/嗅覺的訊息接收',                      chapter: 'promo-s-ch' },
+    { id: 'promo-s-braille',  group: 'promo', name: '點字介紹',             desc: '六點架構、數字猜謎、英文、注音點字',             chapter: 'promo-s-ch' },
+    { id: 'promo-s-mobility', group: 'promo', name: '手杖與人導法',         desc: '停電情境、手杖、人導法四步驟、導引注意事項',     chapter: 'promo-s-ch' },
+    { id: 'promo-t-ch',       group: 'promo', name: '教師版：重度視障生之教學與輔導', desc: '章節標題頁', type: 'chapter' },
+    { id: 'promo-t-basics',   group: 'promo', name: '學習特性與需求',       desc: '學習特性、需求、點字書、點字顯示器',             chapter: 'promo-t-ch' },
+    { id: 'promo-t-digital',  group: 'promo', name: '電子檔與螢幕報讀',     desc: 'Screen Reader 相容性說明',                      chapter: 'promo-t-ch' },
+    { id: 'promo-t-teaching', group: 'promo', name: '教學調整',             desc: '一般學習、定向行動、回家作業、藝能科',           chapter: 'promo-t-ch' },
+    { id: 'promo-t-exam',     group: 'promo', name: '考試調整',             desc: '平時考、段考方式與成績計算',                     chapter: 'promo-t-ch' },
+    { id: 'promo-t-life',     group: 'promo', name: '學業之外',             desc: '協助目標、心態、聯絡資訊',                       chapter: 'promo-t-ch' },
 ];
 
 // ── 建立 contentEl 對照 ───────────────────────────────────
@@ -240,6 +266,7 @@ const contentEls = {
     viat:    document.getElementById('content-viat'),
     ueb:     document.getElementById('content-ueb'),
     common:  document.getElementById('content-common'),
+    promo:   document.getElementById('content-promo'),
 };
 
 // ── 章節成員索引 ──────────────────────────────────────────
@@ -285,7 +312,7 @@ MODULES.forEach(m => {
 });
 
 // ── 群組全選邏輯 ─────────────────────────────────────────
-const groupIds = ['vitools', 'nvda', 'viat', 'ueb', 'common'];
+const groupIds = ['vitools', 'nvda', 'viat', 'ueb', 'common', 'promo'];
 
 function syncGroupSelectAll(grp) {
     const sa = document.getElementById('sa-' + grp);
