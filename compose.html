@@ -10,28 +10,43 @@ body { font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
     max-width: 720px; margin: 0 auto; padding: 1.5em 1em; background: #f8fafb; color: #1a1a1a; }
 h1 { font-size: 1.4em; color: #1b5e20; margin-bottom: .1em; }
 .subtitle { color: #666; font-size: .9em; margin-bottom: 1.5em; }
-.group { background: #fff; border-radius: 8px; padding: 1em 1.2em; margin-bottom: 1em;
+.group { background: #fff; border-radius: 8px; margin-bottom: 1em;
     border-left: 4px solid #2e7d32; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-.group-header { display: flex; align-items: center; gap: .7em; margin-bottom: .6em; }
-.group-header h2 { font-size: 1em; color: #2e7d32; margin: 0; }
 .group.addon { border-color: #4527a0; }
+.group-header {
+    display: flex; align-items: center; gap: .5em;
+    padding: .9em 1.2em; cursor: pointer; user-select: none;
+    border-radius: 8px;
+}
+.group-header:hover { background: #f4f7f4; border-radius: 8px 8px 0 0; }
+.toggle-btn {
+    background: none; border: none; cursor: pointer; padding: 0 4px;
+    font-size: .8em; color: #888; width: 20px; text-align: center;
+    flex-shrink: 0; line-height: 1;
+}
+.group-header h2 { font-size: 1em; color: #2e7d32; margin: 0; flex: 1; }
 .group.addon .group-header h2 { color: #4527a0; }
 .select-all-label { display: flex; align-items: center; gap: .35em;
-    font-size: .82em; color: #555; cursor: pointer; margin-left: auto; }
+    font-size: .82em; color: #555; cursor: pointer; }
 .select-all-label input { width: 14px; height: 14px; cursor: pointer; }
+/* 收合動畫 */
+.group-content { display: none; padding: .3em 1.2em .8em; border-top: 1px solid #f0f0f0; }
+.group.open .group-content { display: block; }
+/* 模組 label */
 label { display: flex; align-items: flex-start; gap: .6em; padding: .35em 0;
     cursor: pointer; font-size: .92em; line-height: 1.4; }
 label input[type=checkbox] { margin-top: .2em; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer; }
 .mod-desc { color: #666; font-size: .82em; }
-/* ── 章節標題列 ── */
+/* 章節標題列 */
 .ch-row { margin: .55em 0 .1em; }
 .ch-row label {
     background: #e8f5e9; border-left: 4px solid #2e7d32;
     border-radius: 5px; padding: .38em .8em; gap: .5em; font-size: .88em;
 }
 .ch-row .ch-name { font-weight: 700; color: #1b5e20; }
-/* ── 章節內縮排 ── */
+/* 章節內模組縮排 */
 .ch-mod { padding-left: 1.4em; }
+/* 按鈕 */
 .actions { display: flex; gap: .8em; margin-top: 1.5em; flex-wrap: wrap; }
 button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer;
     font-size: .95em; font-family: inherit; }
@@ -51,38 +66,58 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 <p class="subtitle">勾選要放入的模組，按「預覽簡報」直接開啟，或複製連結分享講義。</p>
 
 <div class="group" id="group-vitools">
-    <div class="group-header">
+    <div class="group-header" onclick="toggleGroup('vitools')">
+        <button class="toggle-btn" id="tb-vitools" aria-expanded="false">▶</button>
         <h2>vi-tools 工具</h2>
-        <label class="select-all-label"><input type="checkbox" id="sa-vitools"> 全選</label>
+        <label class="select-all-label" onclick="event.stopPropagation()">
+            <input type="checkbox" id="sa-vitools"> 全選
+        </label>
     </div>
+    <div class="group-content" id="content-vitools"></div>
 </div>
 
 <div class="group addon" id="group-nvda">
-    <div class="group-header">
+    <div class="group-header" onclick="toggleGroup('nvda')">
+        <button class="toggle-btn" id="tb-nvda" aria-expanded="false">▶</button>
         <h2>NVDA 附加元件</h2>
-        <label class="select-all-label"><input type="checkbox" id="sa-nvda"> 全選</label>
+        <label class="select-all-label" onclick="event.stopPropagation()">
+            <input type="checkbox" id="sa-nvda"> 全選
+        </label>
     </div>
+    <div class="group-content" id="content-nvda"></div>
 </div>
 
 <div class="group" id="group-viat" style="border-color:#e65100">
-    <div class="group-header">
+    <div class="group-header" onclick="toggleGroup('viat')">
+        <button class="toggle-btn" id="tb-viat" aria-expanded="false">▶</button>
         <h2 style="color:#e65100">視障生學習與輔助科技</h2>
-        <label class="select-all-label"><input type="checkbox" id="sa-viat"> 全選</label>
+        <label class="select-all-label" onclick="event.stopPropagation()">
+            <input type="checkbox" id="sa-viat"> 全選
+        </label>
     </div>
+    <div class="group-content" id="content-viat"></div>
 </div>
 
 <div class="group" id="group-ueb" style="border-color:#00695c">
-    <div class="group-header">
+    <div class="group-header" onclick="toggleGroup('ueb')">
+        <button class="toggle-btn" id="tb-ueb" aria-expanded="false">▶</button>
         <h2 style="color:#00695c">UEB 規則介紹</h2>
-        <label class="select-all-label"><input type="checkbox" id="sa-ueb"> 全選</label>
+        <label class="select-all-label" onclick="event.stopPropagation()">
+            <input type="checkbox" id="sa-ueb"> 全選
+        </label>
     </div>
+    <div class="group-content" id="content-ueb"></div>
 </div>
 
 <div class="group" id="group-common">
-    <div class="group-header">
+    <div class="group-header" onclick="toggleGroup('common')">
+        <button class="toggle-btn" id="tb-common" aria-expanded="false">▶</button>
         <h2>共用頁面</h2>
-        <label class="select-all-label"><input type="checkbox" id="sa-common"> 全選</label>
+        <label class="select-all-label" onclick="event.stopPropagation()">
+            <input type="checkbox" id="sa-common"> 全選
+        </label>
     </div>
+    <div class="group-content" id="content-common"></div>
 </div>
 
 <div class="actions">
@@ -106,40 +141,40 @@ const MODULES = [
     { id: 'query-detail',      group: 'vitools', name: 'UEB 查詢（詳細）',   desc: '功能與適用情境' },
     { id: 'proofing',          group: 'vitools', name: '雙視校對與存檔',     desc: '跨裝置工作流程說明' },
     // NVDA 附加元件
-    { id: 'nvda-overview',     group: 'nvda', name: 'NVDA 附加元件概覽',  desc: '五個附加元件一覽' },
-    { id: 'braille-table',     group: 'nvda', name: '點字表切換',          desc: '快捷鍵與切換順序' },
-    { id: '6d-ime',            group: 'nvda', name: '六點輸入法',          desc: '快捷鍵、模式、六鍵對應' },
-    { id: 'dict-switcher',     group: 'nvda', name: '語音字典切換',        desc: '快捷鍵與各字典說明' },
-    { id: 'zh-dict',           group: 'nvda', name: '國語字典查詢',        desc: '快捷鍵與查詢結果' },
-    { id: 'braille-export',    group: 'nvda', name: '點字輸出匯出',        desc: '快捷鍵、輸出格式、適用情境' },
+    { id: 'nvda-overview',  group: 'nvda', name: 'NVDA 附加元件概覽', desc: '五個附加元件一覽' },
+    { id: 'braille-table',  group: 'nvda', name: '點字表切換',         desc: '快捷鍵與切換順序' },
+    { id: '6d-ime',         group: 'nvda', name: '六點輸入法',         desc: '快捷鍵、模式、六鍵對應' },
+    { id: 'dict-switcher',  group: 'nvda', name: '語音字典切換',       desc: '快捷鍵與各字典說明' },
+    { id: 'zh-dict',        group: 'nvda', name: '國語字典查詢',       desc: '快捷鍵與查詢結果' },
+    { id: 'braille-export', group: 'nvda', name: '點字輸出匯出',       desc: '快捷鍵、輸出格式、適用情境' },
     // 視障生學習與輔助科技
-    { id: 'viat-title',  group: 'viat', name: '標題頁', desc: '淺談視障生學習與輔助科技' },
+    { id: 'viat-title', group: 'viat', name: '標題頁', desc: '淺談視障生學習與輔助科技' },
     // 第一章
-    { id: 'viat-ch1',          group: 'viat', name: '視覺障礙認識',        desc: '章節標題頁', type: 'chapter' },
-    { id: 'viat-definition',   group: 'viat', name: '視覺障礙定義與分類',  desc: '法規定義 + 教學分類（低視力/盲/CVI）' },
-    { id: 'viat-vision-field', group: 'viat', name: '視野圖',              desc: '視野缺損類型模擬圖' },
-    { id: 'viat-eye-anatomy',  group: 'viat', name: '眼球結構',            desc: '解剖圖 + Amsler 方格表' },
-    { id: 'viat-eye-conditions', group: 'viat', name: '眼疾視覺模擬',      desc: '白內障/青光眼/視網膜病變/黃斑部病變三階段' },
-    { id: 'viat-eye-treatment',  group: 'viat', name: '眼科治療',          desc: '雷射手術、白內障手術、人工水晶體' },
-    { id: 'viat-cvi',          group: 'viat', name: 'CVI 視覺皮質損傷',   desc: '特徵、評估、教學輔具' },
-    { id: 'viat-resources',    group: 'viat', name: '視障相關資源',        desc: '教育/勞政/社政資源架構' },
-    { id: 'viat-at-overview',  group: 'viat', name: '輔助科技分類',        desc: '視覺/聽覺/觸覺輔助科技總覽' },
-    { id: 'viat-materials',    group: 'viat', name: '視障教材',            desc: '大字書、點字書、雙視合訂本' },
+    { id: 'viat-ch1',          group: 'viat', name: '視覺障礙認識',       desc: '章節標題頁', type: 'chapter' },
+    { id: 'viat-definition',   group: 'viat', name: '視覺障礙定義與分類', desc: '法規定義 + 教學分類（低視力/盲/CVI）',  chapter: 'viat-ch1' },
+    { id: 'viat-vision-field', group: 'viat', name: '視野圖',             desc: '視野缺損類型模擬圖',                    chapter: 'viat-ch1' },
+    { id: 'viat-eye-anatomy',  group: 'viat', name: '眼球結構',           desc: '解剖圖 + Amsler 方格表',               chapter: 'viat-ch1' },
+    { id: 'viat-eye-conditions', group: 'viat', name: '眼疾視覺模擬',     desc: '白內障/青光眼/視網膜病變/黃斑部病變',   chapter: 'viat-ch1' },
+    { id: 'viat-eye-treatment',  group: 'viat', name: '眼科治療',         desc: '雷射手術、白內障手術、人工水晶體',       chapter: 'viat-ch1' },
+    { id: 'viat-cvi',          group: 'viat', name: 'CVI 視覺皮質損傷',  desc: '特徵、評估、教學輔具',                   chapter: 'viat-ch1' },
+    { id: 'viat-resources',    group: 'viat', name: '視障相關資源',       desc: '教育/勞政/社政資源架構',                 chapter: 'viat-ch1' },
+    { id: 'viat-at-overview',  group: 'viat', name: '輔助科技分類',       desc: '視覺/聽覺/觸覺輔助科技總覽',             chapter: 'viat-ch1' },
+    { id: 'viat-materials',    group: 'viat', name: '視障教材',           desc: '大字書、點字書、雙視合訂本',             chapter: 'viat-ch1' },
     // 第二章
     { id: 'viat-ch2',              group: 'viat', name: '視覺輔具',                desc: '章節標題頁', type: 'chapter' },
-    { id: 'viat-magnifier',        group: 'viat', name: '放大鏡',                  desc: '各類放大鏡 + 手機放大鏡 APP' },
-    { id: 'viat-cctv-portable',    group: 'viat', name: '攜帶型擴視機 / 望遠鏡',   desc: '攜帶型擴視機優缺點、望遠鏡' },
-    { id: 'viat-cctv-desktop',     group: 'viat', name: '桌上型擴視機',            desc: '桌上型擴視機優缺點、雙擴視機' },
-    { id: 'viat-cctv-headmounted', group: 'viat', name: '頭戴式擴視機 / 特殊眼鏡', desc: 'Eyedaptic / Iris Vision / eSight / 濾光鏡' },
+    { id: 'viat-magnifier',        group: 'viat', name: '放大鏡',                  desc: '各類放大鏡 + 手機放大鏡 APP',          chapter: 'viat-ch2' },
+    { id: 'viat-cctv-portable',    group: 'viat', name: '攜帶型擴視機 / 望遠鏡',   desc: '攜帶型擴視機優缺點、望遠鏡',            chapter: 'viat-ch2' },
+    { id: 'viat-cctv-desktop',     group: 'viat', name: '桌上型擴視機',            desc: '桌上型擴視機優缺點、雙擴視機',          chapter: 'viat-ch2' },
+    { id: 'viat-cctv-headmounted', group: 'viat', name: '頭戴式擴視機 / 特殊眼鏡', desc: 'Eyedaptic / Iris Vision / eSight',      chapter: 'viat-ch2' },
     // 第三章
-    { id: 'viat-ch3',            group: 'viat', name: '點字與語音輔具', desc: '章節標題頁', type: 'chapter' },
-    { id: 'viat-ocr-tts',       group: 'viat', name: 'OCR & TTS',      desc: 'OCR/TTS 原理、OrCam、Envision Glasses' },
-    { id: 'viat-braille-system', group: 'viat', name: '點字系統',       desc: '數字/英文/注音點字對照表' },
-    { id: 'viat-braille-devices',group: 'viat', name: '點字設備',       desc: '點字機/板/印表機/顯示器/手杖/其他' },
+    { id: 'viat-ch3',             group: 'viat', name: '點字與語音輔具', desc: '章節標題頁', type: 'chapter' },
+    { id: 'viat-ocr-tts',        group: 'viat', name: 'OCR & TTS',      desc: 'OCR/TTS 原理、OrCam、Envision Glasses', chapter: 'viat-ch3' },
+    { id: 'viat-braille-system',  group: 'viat', name: '點字系統',       desc: '數字/英文/注音點字對照表',               chapter: 'viat-ch3' },
+    { id: 'viat-braille-devices', group: 'viat', name: '點字設備',       desc: '點字機/板/印表機/顯示器/手杖/其他',      chapter: 'viat-ch3' },
     // 第四章
     { id: 'viat-ch4',     group: 'viat', name: '電腦、手機與 AI', desc: '章節標題頁', type: 'chapter' },
-    { id: 'viat-computer',group: 'viat', name: '電腦輔助設定 / NVDA', desc: '網頁縮放、Windows 協助工具、NVDA 介紹' },
-    { id: 'viat-ai',      group: 'viat', name: 'AI 應用',          desc: 'TalkBack / Be My Eyes / Envision / AI 眼鏡' },
+    { id: 'viat-computer',group: 'viat', name: '電腦輔助設定 / NVDA', desc: '網頁縮放、Windows 協助工具、NVDA',   chapter: 'viat-ch4' },
+    { id: 'viat-ai',      group: 'viat', name: 'AI 應用',          desc: 'TalkBack / Be My Eyes / Envision',   chapter: 'viat-ch4' },
     // UEB 規則介紹
     { id: 'ueb-intro',              group: 'ueb', name: 'UEB 開始之前',              desc: '學習策略與背景概念' },
     { id: 'ueb-types',              group: 'ueb', name: 'UEB 縮寫類型概覽',          desc: '七大類型簡介' },
@@ -154,18 +189,28 @@ const MODULES = [
     { id: 'closing', group: 'common', name: '結尾頁', desc: '網址與開源資訊' },
 ];
 
-// ── 建立勾選介面 ──────────────────────────────────────────
-const groupEls = {
-    vitools: document.getElementById('group-vitools'),
-    nvda:    document.getElementById('group-nvda'),
-    viat:    document.getElementById('group-viat'),
-    ueb:     document.getElementById('group-ueb'),
-    common:  document.getElementById('group-common'),
+// ── 建立 contentEl 對照 ───────────────────────────────────
+const contentEls = {
+    vitools: document.getElementById('content-vitools'),
+    nvda:    document.getElementById('content-nvda'),
+    viat:    document.getElementById('content-viat'),
+    ueb:     document.getElementById('content-ueb'),
+    common:  document.getElementById('content-common'),
 };
 
+// ── 章節成員索引 ──────────────────────────────────────────
+const chapterMembers = {};
 MODULES.forEach(m => {
-    const grpEl = groupEls[m.group];
-    if (!grpEl) return;
+    if (m.chapter) {
+        if (!chapterMembers[m.chapter]) chapterMembers[m.chapter] = [];
+        chapterMembers[m.chapter].push(m.id);
+    }
+});
+
+// ── 建立勾選介面 ──────────────────────────────────────────
+MODULES.forEach(m => {
+    const cel = contentEls[m.group];
+    if (!cel) return;
 
     if (m.type === 'chapter') {
         const wrap = document.createElement('div');
@@ -174,36 +219,64 @@ MODULES.forEach(m => {
         lbl.innerHTML = `<input type="checkbox" name="mod" value="${m.id}">
             <span class="ch-name">${m.name}</span>`;
         wrap.appendChild(lbl);
-        grpEl.appendChild(wrap);
+        cel.appendChild(wrap);
+
+        // 勾選章節時同步章節內所有模組
+        const cb = lbl.querySelector('input');
+        cb.addEventListener('change', function () {
+            (chapterMembers[m.id] || []).forEach(memberId => {
+                const memberCb = document.querySelector(`input[value="${memberId}"]`);
+                if (memberCb) memberCb.checked = this.checked;
+            });
+            syncGroupSelectAll(m.group);
+            syncUrl();
+        });
     } else {
         const label = document.createElement('label');
-        const inViatGroup = m.group === 'viat' && m.id !== 'viat-title';
-        if (inViatGroup) label.classList.add('ch-mod');
+        if (m.chapter) label.classList.add('ch-mod');
         label.innerHTML = `<input type="checkbox" name="mod" value="${m.id}">
             <span><strong>${m.name}</strong><br><span class="mod-desc">${m.desc}</span></span>`;
-        grpEl.appendChild(label);
+        cel.appendChild(label);
     }
 });
 
-// ── 類別全選邏輯 ─────────────────────────────────────────
-['vitools', 'nvda', 'viat', 'ueb', 'common'].forEach(grp => {
+// ── 群組全選邏輯 ─────────────────────────────────────────
+const groupIds = ['vitools', 'nvda', 'viat', 'ueb', 'common'];
+
+function syncGroupSelectAll(grp) {
     const sa = document.getElementById('sa-' + grp);
-    const boxes = () => document.querySelectorAll(`#group-${grp} input[name=mod]`);
+    const all = Array.from(document.querySelectorAll(`#content-${grp} input[name=mod]`));
+    sa.checked = all.length > 0 && all.every(c => c.checked);
+    sa.indeterminate = !sa.checked && all.some(c => c.checked);
+}
+
+groupIds.forEach(grp => {
+    const sa = document.getElementById('sa-' + grp);
 
     sa.addEventListener('change', () => {
-        boxes().forEach(cb => { cb.checked = sa.checked; });
+        document.querySelectorAll(`#content-${grp} input[name=mod]`).forEach(cb => {
+            cb.checked = sa.checked;
+        });
         syncUrl();
     });
-    groupEls[grp].addEventListener('change', e => {
+
+    document.getElementById('content-' + grp).addEventListener('change', e => {
         if (e.target.name !== 'mod') return;
-        const all = Array.from(boxes());
-        sa.checked = all.every(c => c.checked);
-        sa.indeterminate = !sa.checked && all.some(c => c.checked);
+        syncGroupSelectAll(grp);
         syncUrl();
     });
 });
 
-// ── 從 URL 還原勾選狀態 ──────────────────────────────────
+// ── 群組展開/收合 ────────────────────────────────────────
+function toggleGroup(grp) {
+    const group = document.getElementById('group-' + grp);
+    const btn = document.getElementById('tb-' + grp);
+    const isOpen = group.classList.toggle('open');
+    btn.textContent = isOpen ? '▼' : '▶';
+    btn.setAttribute('aria-expanded', isOpen);
+}
+
+// ── URL 同步 ──────────────────────────────────────────────
 function getSelected() {
     return Array.from(document.querySelectorAll('input[name=mod]:checked')).map(el => el.value);
 }
@@ -219,20 +292,31 @@ function syncUrl() {
 function restoreFromUrl() {
     const params = new URLSearchParams(location.search);
     const ids = (params.get('m') || '').split(',').filter(Boolean);
-    ids.forEach(id => {
-        const cb = document.querySelector(`input[value="${id}"]`);
-        if (cb) cb.checked = true;
-    });
-    ['vitools', 'nvda', 'viat', 'ueb', 'common'].forEach(grp => {
-        const sa = document.getElementById('sa-' + grp);
-        const all = Array.from(document.querySelectorAll(`#group-${grp} input[name=mod]`));
-        sa.checked = all.every(c => c.checked);
-        sa.indeterminate = !sa.checked && all.some(c => c.checked);
-    });
+    if (ids.length) {
+        // 有 URL 時展開有選項的群組
+        ids.forEach(id => {
+            const cb = document.querySelector(`input[value="${id}"]`);
+            if (cb) cb.checked = true;
+        });
+        const openGroups = new Set();
+        ids.forEach(id => {
+            const m = MODULES.find(m => m.id === id);
+            if (m) openGroups.add(m.group);
+        });
+        openGroups.forEach(grp => {
+            const group = document.getElementById('group-' + grp);
+            const btn = document.getElementById('tb-' + grp);
+            if (group && !group.classList.contains('open')) {
+                group.classList.add('open');
+                if (btn) { btn.textContent = '▼'; btn.setAttribute('aria-expanded', 'true'); }
+            }
+        });
+    }
+    groupIds.forEach(syncGroupSelectAll);
 }
 restoreFromUrl();
 
-// ── 按鈕邏輯 ────────────────────────────────────────────
+// ── 按鈕邏輯 ─────────────────────────────────────────────
 const statusEl = document.getElementById('status');
 function showStatus(msg, ms = 2500) {
     statusEl.textContent = msg;

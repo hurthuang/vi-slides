@@ -146,7 +146,6 @@ function initTOC() {
         b.innerHTML = `<span class="toc-num">${i + 1}</span><span>${title}</span>`;
         b.addEventListener('click', () => {
             Reveal.slide(i);
-            closeTOC();
         });
         li.appendChild(b);
         list.appendChild(li);
