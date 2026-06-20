@@ -151,6 +151,19 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
     <div class="group-content" id="content-promo"></div>
 </div>
 
+
+<div class="group" id="group-lxb" style="border-color:#6a1b9a">
+    <div class="group-header" onclick="toggleGroup('lxb')">
+        <span class="drag-handle group-drag-handle" aria-hidden="true">⠿</span>
+        <button class="toggle-btn" id="tb-lxb" aria-expanded="false">▶</button>
+        <h2 style="color:#6a1b9a">學分班</h2>
+        <label class="select-all-label" onclick="event.stopPropagation()">
+            <input type="checkbox" id="sa-lxb"> 全選
+        </label>
+    </div>
+    <div class="group-content" id="content-lxb"></div>
+</div>
+
 </div><!-- #groups-container -->
 
 <div class="actions">
@@ -257,6 +270,14 @@ const MODULES = [
     { id: 'promo-t-teaching', group: 'promo', name: '教學調整',             desc: '一般學習、定向行動、回家作業、藝能科',           chapter: 'promo-t-ch' },
     { id: 'promo-t-exam',     group: 'promo', name: '考試調整',             desc: '平時考、段考方式與成績計算',                     chapter: 'promo-t-ch' },
     { id: 'promo-t-life',     group: 'promo', name: '學業之外',             desc: '協助目標、心態、聯絡資訊',                       chapter: 'promo-t-ch' },
+    // 學分班
+    { id: 'lxb-ch1',           group: 'lxb', name: '第一週：視覺障礙與功能性視覺', desc: '章節標題頁', type: 'chapter' },
+    { id: 'lxb-vi-definition', group: 'lxb', name: '視覺障礙定義與鑑定',   desc: '鑑定辦法條文、Peek Acuity、視野圖',                  chapter: 'lxb-ch1' },
+    { id: 'lxb-eye-sim-app',   group: 'lxb', name: '視覺損傷模擬軟體',     desc: 'ViaOpta Simulator / Impairment Simulator',          chapter: 'lxb-ch1' },
+    { id: 'lxb-baseball',      group: 'lxb', name: '盲人棒球 + 模擬眼鏡活動', desc: '盲人棒球、製作視覺模擬眼鏡、試用活動',              chapter: 'lxb-ch1' },
+    { id: 'lxb-fva-intro',     group: 'lxb', name: '功能性視覺評估概念',   desc: 'FVA vs 學習媒介評量、安置流程、FVA 定義',             chapter: 'lxb-ch1' },
+    { id: 'lxb-fva-items',     group: 'lxb', name: '功能性視覺評估項目',   desc: '14 項評估項目、評估原則、常用引導問題',               chapter: 'lxb-ch1' },
+    { id: 'lxb-fva-tools',     group: 'lxb', name: '評估工具與活動',       desc: '自編工具、線上資源、設計評估活動',                    chapter: 'lxb-ch1' },
 ];
 
 // ── 建立 contentEl 對照 ───────────────────────────────────
@@ -267,6 +288,7 @@ const contentEls = {
     ueb:     document.getElementById('content-ueb'),
     common:  document.getElementById('content-common'),
     promo:   document.getElementById('content-promo'),
+    lxb:     document.getElementById('content-lxb'),
 };
 
 // ── 章節成員索引 ──────────────────────────────────────────
@@ -312,7 +334,7 @@ MODULES.forEach(m => {
 });
 
 // ── 群組全選邏輯 ─────────────────────────────────────────
-const groupIds = ['vitools', 'nvda', 'viat', 'ueb', 'common', 'promo'];
+const groupIds = ['vitools', 'nvda', 'viat', 'ueb', 'common', 'promo', 'lxb'];
 
 function syncGroupSelectAll(grp) {
     const sa = document.getElementById('sa-' + grp);
