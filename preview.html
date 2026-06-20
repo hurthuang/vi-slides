@@ -6,6 +6,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.css">
 <link rel="stylesheet" href="shared/slides-core.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rajgoel/reveal.js-plugins@master/chalkboard/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
 <style>
 #toc-btn {
     position: fixed; top: 12px; right: 150px; z-index: 99999;
@@ -45,6 +47,19 @@
 #toc-list button:hover { background: #e8f5e9; }
 #toc-list button.toc-current { background: #e8f5e9; font-weight: 700; color: #1b5e20; }
 .toc-num { color: #aaa; font-size: .85em; min-width: 2.4em; flex-shrink: 0; }
+/* lightbox */
+#img-lightbox {
+    position: fixed; inset: 0; z-index: 999999;
+    background: rgba(0,0,0,.88);
+    display: flex; align-items: center; justify-content: center;
+    cursor: zoom-out;
+}
+#img-lightbox img {
+    max-width: 95vw; max-height: 95vh;
+    border-radius: 6px; box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    pointer-events: none;
+}
+.reveal .slides img { cursor: zoom-in; }
 </style>
 </head>
 <body>
@@ -75,6 +90,8 @@
 <article id="reading-view" hidden tabindex="-1" lang="zh-TW" aria-label="簡報閱讀版"></article>
 
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/zoom/zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/rajgoel/reveal.js-plugins@master/chalkboard/plugin.js"></script>
 <script src="shared/slides-core.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
@@ -122,9 +139,34 @@ function boot() {
         width: 1024,
         height: 720,
         navigationMode: 'linear',
+        mouseWheel: true,
+        plugins: [RevealZoom, RevealChalkboard],
+        chalkboard: { boardmarkerWidth: 3, chalkEffect: 0.5 },
     }).then(() => {
         initSlides();
         initTOC();
+        initLightbox();
+    });
+}
+
+function initLightbox() {
+    const overlay = document.createElement('div');
+    overlay.id = 'img-lightbox';
+    overlay.hidden = true;
+    const img = document.createElement('img');
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+
+    container.addEventListener('click', e => {
+        const t = e.target.closest('img');
+        if (!t) return;
+        img.src = t.src;
+        img.alt = t.alt;
+        overlay.hidden = false;
+    });
+    overlay.addEventListener('click', () => { overlay.hidden = true; });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && !overlay.hidden) { overlay.hidden = true; e.stopPropagation(); }
     });
 }
 
