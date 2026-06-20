@@ -57,7 +57,7 @@
     border-radius: 6px; box-shadow: 0 8px 32px rgba(0,0,0,.5);
     pointer-events: none;
 }
-.reveal .slides img { cursor: pointer; }
+.reveal .slides img { cursor: default; }
 </style>
 </head>
 <body>
@@ -153,8 +153,11 @@ function initLightbox() {
     document.body.appendChild(overlay);
 
     container.addEventListener('click', e => {
+        if (!e.altKey) return;
         const t = e.target.closest('img');
         if (!t) return;
+        e.preventDefault();
+        e.stopPropagation();
         img.src = t.src;
         img.alt = t.alt;
         overlay.hidden = false;
