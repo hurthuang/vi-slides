@@ -6,6 +6,29 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.css">
 <link rel="stylesheet" href="shared/slides-core.css">
+<style>
+#topbar {
+    position: fixed; top: 8px; right: 10px; z-index: 9999;
+    display: flex; gap: 6px; align-items: center;
+}
+#toggle-reading {
+    padding: 4px 10px; font-size: .8em; cursor: pointer;
+    background: #fff; border: 1px solid #aaa; border-radius: 4px;
+}
+#jump-bar {
+    display: flex; gap: 4px; align-items: center;
+}
+#jump-n {
+    width: 3.8em; padding: 3px 5px; font-size: .8em;
+    border: 1px solid #aaa; border-radius: 4px; text-align: center;
+}
+#jump-go {
+    padding: 3px 8px; font-size: .8em; cursor: pointer;
+    background: #fff; border: 1px solid #aaa; border-radius: 4px;
+}
+#jump-go:hover, #toggle-reading:hover { background: #e8f0fe; }
+#jump-total { font-size: .75em; color: #888; }
+</style>
 </head>
 <body>
 
@@ -13,7 +36,15 @@
     <p>這是一份投影片簡報。若使用螢幕閱讀器，建議按右上角「切換閱讀版」按鈕以一般網頁方式閱讀。</p>
 </nav>
 <div id="a11y-live" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
-<button id="toggle-reading" aria-pressed="false">切換閱讀版</button>
+
+<div id="topbar">
+    <div id="jump-bar" aria-label="跳至指定頁">
+        <input type="number" id="jump-n" min="1" placeholder="頁碼" aria-label="頁碼">
+        <button id="jump-go" aria-label="跳至">跳至</button>
+        <span id="jump-total"></span>
+    </div>
+    <button id="toggle-reading" aria-pressed="false">切換閱讀版</button>
+</div>
 
 <div class="reveal">
     <div class="slides" role="main" id="slide-container">
@@ -40,19 +71,15 @@ if (!modIds.length) {
             .then(r => r.ok ? r.text() : `<section><p style="color:red">模組 ${id} 載入失敗</p></section>`)
             .catch(() => `<section><p style="color:red">模組 ${id} 載入失敗</p></section>`)
     )).then(htmls => {
-        // 組裝投影片
         container.innerHTML = htmls.join('\n');
 
-        // 組裝閱讀版：複製每個 section，動態加頁次標籤與「切換至投影片」連結
         const slides = Array.from(container.querySelectorAll('section'));
         slides.forEach((sec, i) => {
             const clone = sec.cloneNode(true);
-            // 加頁次標籤
             const label = document.createElement('span');
             label.className = 'slide-label';
             label.textContent = `第 ${i + 1} 頁`;
             clone.insertBefore(label, clone.firstChild);
-            // 複製 aria-label 供 region 導覽
             const al = sec.getAttribute('aria-label');
             if (al) clone.setAttribute('aria-label', `第 ${i + 1} 頁：${al.replace(/^第\s*\d+\s*頁[：:]?\s*/, '')}`);
             rv.appendChild(clone);
@@ -74,7 +101,29 @@ function boot() {
         margin: 0.04,
         width: 1024,
         height: 720,
-    }).then(() => initSlides());
+        navigationMode: 'linear',
+    }).then(() => {
+        initSlides();
+        initJump();
+    });
+}
+
+function initJump() {
+    const input = document.getElementById('jump-n');
+    const total = Reveal.getTotalSlides();
+    input.max = total;
+    document.getElementById('jump-total').textContent = `/ ${total}`;
+
+    function jump() {
+        const n = parseInt(input.value, 10);
+        if (n >= 1 && n <= total) {
+            Reveal.slide(n - 1);
+            input.value = '';
+            input.blur();
+        }
+    }
+    document.getElementById('jump-go').addEventListener('click', jump);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') jump(); });
 }
 </script>
 </body>
