@@ -38,14 +38,25 @@ label { display: flex; align-items: flex-start; gap: .6em; padding: .35em 0;
 label input[type=checkbox] { margin-top: .2em; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer; }
 .mod-desc { color: #666; font-size: .82em; }
 /* 章節標題列 */
-.ch-row { margin: .55em 0 .1em; }
+.ch-row { margin: .55em 0 .1em; display: flex; align-items: center; gap: 4px; }
 .ch-row label {
-    background: #e8f5e9; border-left: 4px solid #2e7d32;
+    flex: 1; background: #e8f5e9; border-left: 4px solid #2e7d32;
     border-radius: 5px; padding: .38em .8em; gap: .5em; font-size: .88em;
 }
 .ch-row .ch-name { font-weight: 700; color: #1b5e20; }
 /* 章節內模組縮排 */
 .ch-mod { padding-left: 1.4em; }
+/* 拖曳 */
+.drag-handle {
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #ccc; font-size: 1.05em; width: 20px; flex-shrink: 0;
+    cursor: grab; user-select: none; touch-action: none;
+}
+.drag-handle:hover { color: #888; }
+.drag-handle:active { cursor: grabbing; }
+.dragging { opacity: .35; }
+.drag-over-top    { box-shadow: 0 -2px 0 0 #1565c0; }
+.drag-over-bottom { box-shadow: 0  2px 0 0 #1565c0; }
 /* 按鈕 */
 .actions { display: flex; gap: .8em; margin-top: 1.5em; flex-wrap: wrap; }
 button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer;
@@ -65,8 +76,11 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 <h1>vi-slides 簡報組合器</h1>
 <p class="subtitle">勾選要放入的模組，按「預覽簡報」直接開啟，或複製連結分享講義。</p>
 
+<div id="groups-container">
+
 <div class="group" id="group-vitools">
     <div class="group-header" onclick="toggleGroup('vitools')">
+        <span class="drag-handle group-drag-handle" aria-hidden="true">⠿</span>
         <button class="toggle-btn" id="tb-vitools" aria-expanded="false">▶</button>
         <h2>vi-tools 工具</h2>
         <label class="select-all-label" onclick="event.stopPropagation()">
@@ -78,6 +92,7 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 
 <div class="group addon" id="group-nvda">
     <div class="group-header" onclick="toggleGroup('nvda')">
+        <span class="drag-handle group-drag-handle" aria-hidden="true">⠿</span>
         <button class="toggle-btn" id="tb-nvda" aria-expanded="false">▶</button>
         <h2>NVDA 附加元件</h2>
         <label class="select-all-label" onclick="event.stopPropagation()">
@@ -89,6 +104,7 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 
 <div class="group" id="group-viat" style="border-color:#e65100">
     <div class="group-header" onclick="toggleGroup('viat')">
+        <span class="drag-handle group-drag-handle" aria-hidden="true">⠿</span>
         <button class="toggle-btn" id="tb-viat" aria-expanded="false">▶</button>
         <h2 style="color:#e65100">視障生學習與輔助科技</h2>
         <label class="select-all-label" onclick="event.stopPropagation()">
@@ -100,6 +116,7 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 
 <div class="group" id="group-ueb" style="border-color:#00695c">
     <div class="group-header" onclick="toggleGroup('ueb')">
+        <span class="drag-handle group-drag-handle" aria-hidden="true">⠿</span>
         <button class="toggle-btn" id="tb-ueb" aria-expanded="false">▶</button>
         <h2 style="color:#00695c">UEB 規則介紹</h2>
         <label class="select-all-label" onclick="event.stopPropagation()">
@@ -111,6 +128,7 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 
 <div class="group" id="group-common">
     <div class="group-header" onclick="toggleGroup('common')">
+        <span class="drag-handle group-drag-handle" aria-hidden="true">⠿</span>
         <button class="toggle-btn" id="tb-common" aria-expanded="false">▶</button>
         <h2>共用頁面</h2>
         <label class="select-all-label" onclick="event.stopPropagation()">
@@ -119,6 +137,8 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
     </div>
     <div class="group-content" id="content-common"></div>
 </div>
+
+</div><!-- #groups-container -->
 
 <div class="actions">
     <button id="btn-preview">預覽簡報</button>
@@ -364,6 +384,175 @@ document.getElementById('btn-pdf').addEventListener('click', () => {
     if (!sel.length) { showStatus('請至少勾選一個模組'); return; }
     window.open(buildPreviewUrl(sel) + '&print-pdf', '_blank');
 });
+
+// ── 拖曳排序 ──────────────────────────────────────────────
+let _dragAllowed = false;
+document.addEventListener('mouseup', () => { _dragAllowed = false; });
+
+function initDragDrop() {
+    Object.values(contentEls).forEach(cel => setupGroupDrag(cel));
+}
+
+function setupGroupDrag(content) {
+    Array.from(content.children).forEach(child => addDragHandle(child));
+
+    let dragGroup = [];
+
+    content.addEventListener('dragstart', e => {
+        if (!_dragAllowed) { e.preventDefault(); return; }
+        const child = nearestDirectChild(content, e.target);
+        if (!child) return;
+        dragGroup = chapterGroup(content, child);
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', '');
+        requestAnimationFrame(() => dragGroup.forEach(el => el.classList.add('dragging')));
+    });
+
+    content.addEventListener('dragover', e => {
+        if (!dragGroup.length) return;
+        e.preventDefault();
+        clearDragIndicators(content);
+        const over = childAtY(content, e.clientY);
+        if (!over || dragGroup.includes(over)) return;
+        const rect = over.getBoundingClientRect();
+        over.classList.add(e.clientY < rect.top + rect.height / 2 ? 'drag-over-top' : 'drag-over-bottom');
+    });
+
+    content.addEventListener('dragleave', e => {
+        if (e.relatedTarget && content.contains(e.relatedTarget)) return;
+        clearDragIndicators(content);
+    });
+
+    content.addEventListener('drop', e => {
+        e.preventDefault();
+        const over = childAtY(content, e.clientY);
+        clearDragIndicators(content);
+        if (over && !dragGroup.includes(over)) {
+            const rect = over.getBoundingClientRect();
+            if (e.clientY < rect.top + rect.height / 2) {
+                dragGroup.forEach(el => content.insertBefore(el, over));
+            } else {
+                const ref = over.nextSibling;
+                dragGroup.forEach(el => content.insertBefore(el, ref));
+            }
+            syncUrl();
+        }
+        endDrag();
+    });
+
+    content.addEventListener('dragend', () => { clearDragIndicators(content); endDrag(); });
+
+    function endDrag() {
+        dragGroup.forEach(el => el.classList.remove('dragging'));
+        dragGroup = [];
+        _dragAllowed = false;
+    }
+
+    function addDragHandle(child) {
+        child.draggable = true;
+        const h = document.createElement('span');
+        h.className = 'drag-handle';
+        h.setAttribute('aria-hidden', 'true');
+        h.textContent = '⠿';
+        h.addEventListener('mousedown', e => { _dragAllowed = true; e.stopPropagation(); });
+        child.insertBefore(h, child.firstChild);
+    }
+}
+
+function nearestDirectChild(parent, el) {
+    while (el && el.parentElement !== parent) el = el.parentElement;
+    return el || null;
+}
+
+function childAtY(content, y) {
+    return Array.from(content.children).find(c => {
+        const r = c.getBoundingClientRect();
+        return y >= r.top && y <= r.bottom;
+    }) || null;
+}
+
+function chapterGroup(content, child) {
+    if (!child.classList.contains('ch-row')) return [child];
+    const result = [child];
+    let next = child.nextElementSibling;
+    while (next && !next.classList.contains('ch-row')) {
+        result.push(next);
+        next = next.nextElementSibling;
+    }
+    return result;
+}
+
+function clearDragIndicators(content) {
+    content.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el =>
+        el.classList.remove('drag-over-top', 'drag-over-bottom')
+    );
+}
+
+initDragDrop();
+
+// ── 大群組拖曳排序 ────────────────────────────────────────
+(function initGroupDragDrop() {
+    const container = document.getElementById('groups-container');
+
+    // 群組 header 的 ⠿ 阻止展開 onclick，並設允許拖曳
+    container.querySelectorAll('.group-drag-handle').forEach(h => {
+        h.addEventListener('mousedown', e => { _dragAllowed = true; e.stopPropagation(); });
+        h.addEventListener('click', e => e.stopPropagation());
+    });
+
+    // 設定每個 .group 為 draggable
+    Array.from(container.children).forEach(g => { g.draggable = true; });
+
+    let dragEl = null;
+
+    container.addEventListener('dragstart', e => {
+        if (!_dragAllowed) { e.preventDefault(); return; }
+        const child = nearestDirectChild(container, e.target);
+        if (!child) return;
+        dragEl = child;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', '');
+        requestAnimationFrame(() => dragEl && dragEl.classList.add('dragging'));
+    });
+
+    container.addEventListener('dragover', e => {
+        if (!dragEl) return;
+        e.preventDefault();
+        clearDragIndicators(container);
+        const over = childAtY(container, e.clientY);
+        if (!over || over === dragEl) return;
+        const rect = over.getBoundingClientRect();
+        over.classList.add(e.clientY < rect.top + rect.height / 2 ? 'drag-over-top' : 'drag-over-bottom');
+    });
+
+    container.addEventListener('dragleave', e => {
+        if (e.relatedTarget && container.contains(e.relatedTarget)) return;
+        clearDragIndicators(container);
+    });
+
+    container.addEventListener('drop', e => {
+        e.preventDefault();
+        const over = childAtY(container, e.clientY);
+        clearDragIndicators(container);
+        if (over && over !== dragEl) {
+            const rect = over.getBoundingClientRect();
+            if (e.clientY < rect.top + rect.height / 2) {
+                container.insertBefore(dragEl, over);
+            } else {
+                container.insertBefore(dragEl, over.nextSibling);
+            }
+            syncUrl();
+        }
+        endGroupDrag();
+    });
+
+    container.addEventListener('dragend', () => { clearDragIndicators(container); endGroupDrag(); });
+
+    function endGroupDrag() {
+        if (dragEl) { dragEl.classList.remove('dragging'); dragEl = null; }
+        _dragAllowed = false;
+    }
+})();
 </script>
 </body>
 </html>
