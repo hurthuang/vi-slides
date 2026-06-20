@@ -23,6 +23,26 @@
 .center { text-align: center !important; }
 .reveal .slide-number { font-size: .5em; }
 
+/* ── 章節標題頁 ── */
+.viat-ch-cover {
+    background: linear-gradient(150deg, #f1f8e9 0%, #e8f5e9 100%) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center;
+}
+.viat-ch-cover .ch-label {
+    font-size: .75em; color: #81c784; letter-spacing: .18em;
+    margin-bottom: .4em; text-transform: uppercase;
+}
+.viat-ch-cover h1 {
+    font-size: 2.2em; color: #1b5e20; font-family: inherit;
+    font-weight: 700; margin: 0; letter-spacing: .04em;
+}
+#reading-view .viat-ch-cover { display: block !important; background: none !important; }
+#reading-view .viat-ch-cover h1 { color: #1b5e20; font-size: 1.6em; }
+
 /* ── 標題頁 ── */
 .slide-cover {
     background: linear-gradient(140deg, #1b5e20 0%, #2e7d32 55%, #004d40 100%) !important;

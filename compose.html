@@ -23,6 +23,15 @@ label { display: flex; align-items: flex-start; gap: .6em; padding: .35em 0;
     cursor: pointer; font-size: .92em; line-height: 1.4; }
 label input[type=checkbox] { margin-top: .2em; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer; }
 .mod-desc { color: #666; font-size: .82em; }
+/* ── 章節標題列 ── */
+.ch-row { margin: .55em 0 .1em; }
+.ch-row label {
+    background: #e8f5e9; border-left: 4px solid #2e7d32;
+    border-radius: 5px; padding: .38em .8em; gap: .5em; font-size: .88em;
+}
+.ch-row .ch-name { font-weight: 700; color: #1b5e20; }
+/* ── 章節內縮排 ── */
+.ch-mod { padding-left: 1.4em; }
 .actions { display: flex; gap: .8em; margin-top: 1.5em; flex-wrap: wrap; }
 button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer;
     font-size: .95em; font-family: inherit; }
@@ -104,25 +113,33 @@ const MODULES = [
     { id: 'zh-dict',           group: 'nvda', name: '國語字典查詢',        desc: '快捷鍵與查詢結果' },
     { id: 'braille-export',    group: 'nvda', name: '點字輸出匯出',        desc: '快捷鍵、輸出格式、適用情境' },
     // 視障生學習與輔助科技
-    { id: 'viat-title',            group: 'viat', name: '標題頁',              desc: '淺談視障生學習與輔助科技' },
-    { id: 'viat-definition',       group: 'viat', name: '視覺障礙定義與分類',  desc: '法規定義 + 教學分類（低視力/盲/CVI）' },
-    { id: 'viat-vision-field',     group: 'viat', name: '視野圖',              desc: '視野缺損類型模擬圖' },
-    { id: 'viat-eye-anatomy',      group: 'viat', name: '眼球結構',            desc: '解剖圖 + Amsler 方格表' },
-    { id: 'viat-eye-conditions',   group: 'viat', name: '眼疾視覺模擬',        desc: '白內障/青光眼/視網膜病變/黃斑部病變三階段' },
-    { id: 'viat-eye-treatment',    group: 'viat', name: '眼科治療',            desc: '雷射手術、白內障手術、人工水晶體' },
-    { id: 'viat-cvi',              group: 'viat', name: 'CVI 視覺皮質損傷',   desc: '特徵、評估、教學輔具' },
-    { id: 'viat-resources',        group: 'viat', name: '視障相關資源',        desc: '教育/勞政/社政資源架構' },
-    { id: 'viat-at-overview',      group: 'viat', name: '輔助科技分類',        desc: '視覺/聽覺/觸覺輔助科技總覽' },
-    { id: 'viat-magnifier',        group: 'viat', name: '放大鏡',              desc: '各類放大鏡 + 手機放大鏡 APP' },
-    { id: 'viat-cctv-portable',    group: 'viat', name: '攜帶型擴視機 / 望遠鏡', desc: '攜帶型擴視機優缺點、望遠鏡' },
-    { id: 'viat-cctv-desktop',     group: 'viat', name: '桌上型擴視機',        desc: '桌上型擴視機優缺點、雙擴視機' },
+    { id: 'viat-title',  group: 'viat', name: '標題頁', desc: '淺談視障生學習與輔助科技' },
+    // 第一章
+    { id: 'viat-ch1',          group: 'viat', name: '視覺障礙認識',        desc: '章節標題頁', type: 'chapter' },
+    { id: 'viat-definition',   group: 'viat', name: '視覺障礙定義與分類',  desc: '法規定義 + 教學分類（低視力/盲/CVI）' },
+    { id: 'viat-vision-field', group: 'viat', name: '視野圖',              desc: '視野缺損類型模擬圖' },
+    { id: 'viat-eye-anatomy',  group: 'viat', name: '眼球結構',            desc: '解剖圖 + Amsler 方格表' },
+    { id: 'viat-eye-conditions', group: 'viat', name: '眼疾視覺模擬',      desc: '白內障/青光眼/視網膜病變/黃斑部病變三階段' },
+    { id: 'viat-eye-treatment',  group: 'viat', name: '眼科治療',          desc: '雷射手術、白內障手術、人工水晶體' },
+    { id: 'viat-cvi',          group: 'viat', name: 'CVI 視覺皮質損傷',   desc: '特徵、評估、教學輔具' },
+    { id: 'viat-resources',    group: 'viat', name: '視障相關資源',        desc: '教育/勞政/社政資源架構' },
+    { id: 'viat-at-overview',  group: 'viat', name: '輔助科技分類',        desc: '視覺/聽覺/觸覺輔助科技總覽' },
+    { id: 'viat-materials',    group: 'viat', name: '視障教材',            desc: '大字書、點字書、雙視合訂本' },
+    // 第二章
+    { id: 'viat-ch2',              group: 'viat', name: '視覺輔具',                desc: '章節標題頁', type: 'chapter' },
+    { id: 'viat-magnifier',        group: 'viat', name: '放大鏡',                  desc: '各類放大鏡 + 手機放大鏡 APP' },
+    { id: 'viat-cctv-portable',    group: 'viat', name: '攜帶型擴視機 / 望遠鏡',   desc: '攜帶型擴視機優缺點、望遠鏡' },
+    { id: 'viat-cctv-desktop',     group: 'viat', name: '桌上型擴視機',            desc: '桌上型擴視機優缺點、雙擴視機' },
     { id: 'viat-cctv-headmounted', group: 'viat', name: '頭戴式擴視機 / 特殊眼鏡', desc: 'Eyedaptic / Iris Vision / eSight / 濾光鏡' },
-    { id: 'viat-ocr-tts',          group: 'viat', name: 'OCR & TTS / AI 眼鏡', desc: 'OCR/TTS 原理、OrCam、Envision Glasses' },
-    { id: 'viat-braille-system',   group: 'viat', name: '點字系統',            desc: '數字/英文/注音點字對照表' },
-    { id: 'viat-braille-devices',  group: 'viat', name: '點字設備',            desc: '點字機/板/印表機/顯示器/手杖/其他' },
-    { id: 'viat-materials',        group: 'viat', name: '視障教材',            desc: '大字書、點字書、雙視合訂本' },
-    { id: 'viat-computer',         group: 'viat', name: '電腦輔助設定 / NVDA', desc: '網頁縮放、Windows 協助工具、NVDA 介紹' },
-    { id: 'viat-ai',               group: 'viat', name: 'AI 應用',             desc: 'TalkBack / Be My Eyes / Envision / AI 眼鏡' },
+    // 第三章
+    { id: 'viat-ch3',            group: 'viat', name: '點字與語音輔具', desc: '章節標題頁', type: 'chapter' },
+    { id: 'viat-ocr-tts',       group: 'viat', name: 'OCR & TTS',      desc: 'OCR/TTS 原理、OrCam、Envision Glasses' },
+    { id: 'viat-braille-system', group: 'viat', name: '點字系統',       desc: '數字/英文/注音點字對照表' },
+    { id: 'viat-braille-devices',group: 'viat', name: '點字設備',       desc: '點字機/板/印表機/顯示器/手杖/其他' },
+    // 第四章
+    { id: 'viat-ch4',     group: 'viat', name: '電腦、手機與 AI', desc: '章節標題頁', type: 'chapter' },
+    { id: 'viat-computer',group: 'viat', name: '電腦輔助設定 / NVDA', desc: '網頁縮放、Windows 協助工具、NVDA 介紹' },
+    { id: 'viat-ai',      group: 'viat', name: 'AI 應用',          desc: 'TalkBack / Be My Eyes / Envision / AI 眼鏡' },
     // UEB 規則介紹
     { id: 'ueb-intro',              group: 'ueb', name: 'UEB 開始之前',              desc: '學習策略與背景概念' },
     { id: 'ueb-types',              group: 'ueb', name: 'UEB 縮寫類型概覽',          desc: '七大類型簡介' },
@@ -134,7 +151,7 @@ const MODULES = [
     { id: 'ueb-initial-final',      group: 'ueb', name: 'Initial/Final Contractions', desc: '5 種前置符號的字首與字尾縮寫' },
     { id: 'ueb-punctuation',        group: 'ueb', name: '標點符號',                  desc: 'UEB 常用標點點字對照' },
     // 共用
-    { id: 'closing',           group: 'common', name: '結尾頁',           desc: '網址與開源資訊' },
+    { id: 'closing', group: 'common', name: '結尾頁', desc: '網址與開源資訊' },
 ];
 
 // ── 建立勾選介面 ──────────────────────────────────────────
@@ -145,11 +162,27 @@ const groupEls = {
     ueb:     document.getElementById('group-ueb'),
     common:  document.getElementById('group-common'),
 };
+
 MODULES.forEach(m => {
-    const label = document.createElement('label');
-    label.innerHTML = `<input type="checkbox" name="mod" value="${m.id}">
-        <span><strong>${m.name}</strong><br><span class="mod-desc">${m.desc}</span></span>`;
-    groupEls[m.group].appendChild(label);
+    const grpEl = groupEls[m.group];
+    if (!grpEl) return;
+
+    if (m.type === 'chapter') {
+        const wrap = document.createElement('div');
+        wrap.className = 'ch-row';
+        const lbl = document.createElement('label');
+        lbl.innerHTML = `<input type="checkbox" name="mod" value="${m.id}">
+            <span class="ch-name">${m.name}</span>`;
+        wrap.appendChild(lbl);
+        grpEl.appendChild(wrap);
+    } else {
+        const label = document.createElement('label');
+        const inViatGroup = m.group === 'viat' && m.id !== 'viat-title';
+        if (inViatGroup) label.classList.add('ch-mod');
+        label.innerHTML = `<input type="checkbox" name="mod" value="${m.id}">
+            <span><strong>${m.name}</strong><br><span class="mod-desc">${m.desc}</span></span>`;
+        grpEl.appendChild(label);
+    }
 });
 
 // ── 類別全選邏輯 ─────────────────────────────────────────
@@ -161,7 +194,6 @@ MODULES.forEach(m => {
         boxes().forEach(cb => { cb.checked = sa.checked; });
         syncUrl();
     });
-    // 子項變動時同步全選狀態
     groupEls[grp].addEventListener('change', e => {
         if (e.target.name !== 'mod') return;
         const all = Array.from(boxes());
@@ -191,7 +223,6 @@ function restoreFromUrl() {
         const cb = document.querySelector(`input[value="${id}"]`);
         if (cb) cb.checked = true;
     });
-    // 還原後同步全選狀態
     ['vitools', 'nvda', 'viat', 'ueb', 'common'].forEach(grp => {
         const sa = document.getElementById('sa-' + grp);
         const all = Array.from(document.querySelectorAll(`#group-${grp} input[name=mod]`));
