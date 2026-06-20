@@ -6,8 +6,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.css">
 <link rel="stylesheet" href="shared/slides-core.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rajgoel/reveal.js-plugins@master/chalkboard/style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
 <style>
 #toc-btn {
     position: fixed; top: 12px; right: 150px; z-index: 99999;
@@ -90,7 +88,6 @@
 <article id="reading-view" hidden tabindex="-1" lang="zh-TW" aria-label="簡報閱讀版"></article>
 
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/rajgoel/reveal.js-plugins@master/chalkboard/plugin.js"></script>
 <script src="shared/slides-core.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
@@ -139,8 +136,7 @@ function boot() {
         height: 720,
         navigationMode: 'linear',
         mouseWheel: true,
-        plugins: [RevealChalkboard],
-        chalkboard: { boardmarkerWidth: 3, chalkEffect: 0.5 },
+        plugins: [],
     }).then(() => {
         initSlides();
         initTOC();
