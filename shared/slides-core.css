@@ -204,6 +204,14 @@
 #reading-view .eg-grid  { grid-template-columns: 1fr; }
 #reading-view .ueb-table, #reading-view .punc-table { font-size: .9em; }
 
+/* ── 輔助科技分類表格 ── */
+.at-table { width: 78%; border-collapse: collapse; margin: 1.4em auto; font-size: .8em; }
+.at-table td { padding: 13px 22px; border: 1px solid #c8e6c9; vertical-align: middle; }
+.at-table td:first-child { background: #e8f5e9; color: #1b5e20; font-weight: 700; text-align: center; white-space: nowrap; width: 160px; }
+.at-table td:last-child { background: #f9fbf9; }
+#reading-view .at-table { width: 100%; font-size: .95em; }
+#reading-view .at-table td:first-child { text-align: left; }
+
 /* ── 圖片 ── */
 .reveal img { max-width: 100%; border-radius: 6px; }
 .img-caption { font-size: .62em; color: #666; text-align: center; margin-top: .25em; }

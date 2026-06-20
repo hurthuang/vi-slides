@@ -7,27 +7,44 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.css">
 <link rel="stylesheet" href="shared/slides-core.css">
 <style>
-#topbar {
-    position: fixed; top: 8px; right: 10px; z-index: 9999;
-    display: flex; gap: 6px; align-items: center;
+#toc-btn {
+    position: fixed; top: 12px; right: 150px; z-index: 99999;
+    padding: .45em 1em; background: #fff; color: #1a1a1a;
+    border: 1px solid #aaa; border-radius: 6px; cursor: pointer;
+    font-size: .85em; font-family: inherit;
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
 }
-#toggle-reading {
-    padding: 4px 10px; font-size: .8em; cursor: pointer;
-    background: #fff; border: 1px solid #aaa; border-radius: 4px;
+#toc-btn:hover, #toc-btn:focus { background: #e8f0fe; outline: 2px solid #1565c0; outline-offset: 2px; }
+#toc-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 99997;
 }
-#jump-bar {
-    display: flex; gap: 4px; align-items: center;
+#toc-panel {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 300px; max-width: 80vw;
+    background: #fff; z-index: 99998; overflow-y: auto;
+    box-shadow: 3px 0 14px rgba(0,0,0,.25);
 }
-#jump-n {
-    width: 3.8em; padding: 3px 5px; font-size: .8em;
-    border: 1px solid #aaa; border-radius: 4px; text-align: center;
+#toc-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 14px; background: #1b5e20; color: #fff;
+    position: sticky; top: 0; z-index: 1;
 }
-#jump-go {
-    padding: 3px 8px; font-size: .8em; cursor: pointer;
-    background: #fff; border: 1px solid #aaa; border-radius: 4px;
+#toc-header span { font-size: .9em; font-weight: 700; }
+#toc-close {
+    background: none; border: none; color: #fff; cursor: pointer;
+    font-size: 1.1em; padding: 2px 7px; border-radius: 4px; line-height: 1;
 }
-#jump-go:hover, #toggle-reading:hover { background: #e8f0fe; }
-#jump-total { font-size: .75em; color: #888; }
+#toc-close:hover { background: rgba(255,255,255,.25); }
+#toc-list { list-style: none; padding: 0; margin: 0; }
+#toc-list button {
+    display: flex; align-items: baseline; gap: 8px; width: 100%;
+    text-align: left; padding: 8px 14px;
+    border: none; border-bottom: 1px solid #f0f0f0;
+    background: none; cursor: pointer;
+    font-size: .82em; font-family: inherit; line-height: 1.45;
+}
+#toc-list button:hover { background: #e8f5e9; }
+#toc-list button.toc-current { background: #e8f5e9; font-weight: 700; color: #1b5e20; }
+.toc-num { color: #aaa; font-size: .85em; min-width: 2.4em; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -37,14 +54,17 @@
 </nav>
 <div id="a11y-live" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
-<div id="topbar">
-    <div id="jump-bar" aria-label="跳至指定頁">
-        <input type="number" id="jump-n" min="1" placeholder="頁碼" aria-label="頁碼">
-        <button id="jump-go" aria-label="跳至">跳至</button>
-        <span id="jump-total"></span>
+<button id="toc-btn" aria-expanded="false" aria-controls="toc-panel">標題列表</button>
+<button id="toggle-reading" aria-pressed="false">切換閱讀版</button>
+
+<div id="toc-overlay" hidden></div>
+<nav id="toc-panel" hidden aria-label="投影片標題列表">
+    <div id="toc-header">
+        <span>投影片列表</span>
+        <button id="toc-close" aria-label="關閉列表">✕</button>
     </div>
-    <button id="toggle-reading" aria-pressed="false">切換閱讀版</button>
-</div>
+    <ol id="toc-list"></ol>
+</nav>
 
 <div class="reveal">
     <div class="slides" role="main" id="slide-container">
@@ -104,26 +124,61 @@ function boot() {
         navigationMode: 'linear',
     }).then(() => {
         initSlides();
-        initJump();
+        initTOC();
     });
 }
 
-function initJump() {
-    const input = document.getElementById('jump-n');
-    const total = Reveal.getTotalSlides();
-    input.max = total;
-    document.getElementById('jump-total').textContent = `/ ${total}`;
+function initTOC() {
+    const btn = document.getElementById('toc-btn');
+    const panel = document.getElementById('toc-panel');
+    const overlay = document.getElementById('toc-overlay');
+    const list = document.getElementById('toc-list');
+    const closeBtn = document.getElementById('toc-close');
 
-    function jump() {
-        const n = parseInt(input.value, 10);
-        if (n >= 1 && n <= total) {
-            Reveal.slide(n - 1);
-            input.value = '';
-            input.blur();
-        }
+    const sections = Array.from(container.querySelectorAll('section'));
+    sections.forEach((sec, i) => {
+        const h2 = sec.querySelector('h2');
+        const ariaLabel = sec.getAttribute('aria-label') || '';
+        const title = ariaLabel || (h2 ? h2.textContent.trim() : `第 ${i + 1} 頁`);
+
+        const li = document.createElement('li');
+        const b = document.createElement('button');
+        b.innerHTML = `<span class="toc-num">${i + 1}</span><span>${title}</span>`;
+        b.addEventListener('click', () => {
+            Reveal.slide(i);
+            closeTOC();
+        });
+        li.appendChild(b);
+        list.appendChild(li);
+    });
+
+    function openTOC() {
+        panel.hidden = false;
+        overlay.hidden = false;
+        btn.setAttribute('aria-expanded', 'true');
+        updateCurrent();
     }
-    document.getElementById('jump-go').addEventListener('click', jump);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') jump(); });
+    function closeTOC() {
+        panel.hidden = true;
+        overlay.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+    }
+    function updateCurrent() {
+        const idx = Reveal.getState().indexh;
+        list.querySelectorAll('button').forEach((b, i) => {
+            b.classList.toggle('toc-current', i === idx);
+        });
+        const cur = list.querySelector('button.toc-current');
+        if (cur) cur.scrollIntoView({ block: 'nearest' });
+    }
+
+    btn.addEventListener('click', () => { panel.hidden ? openTOC() : closeTOC(); });
+    overlay.addEventListener('click', closeTOC);
+    closeBtn.addEventListener('click', closeTOC);
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && !panel.hidden) closeTOC();
+    });
+    Reveal.on('slidechanged', updateCurrent);
 }
 </script>
 </body>
