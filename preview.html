@@ -47,11 +47,13 @@
 .toc-num { color: #aaa; font-size: .85em; min-width: 2.4em; flex-shrink: 0; }
 /* lightbox */
 #img-lightbox {
+    display: none;
     position: fixed; inset: 0; z-index: 999999;
     background: rgba(0,0,0,.88);
-    display: flex; align-items: center; justify-content: center;
+    align-items: center; justify-content: center;
     cursor: zoom-out;
 }
+#img-lightbox.open { display: flex; }
 #img-lightbox img {
     max-width: 95vw; max-height: 95vh;
     border-radius: 6px; box-shadow: 0 8px 32px rgba(0,0,0,.5);
@@ -147,10 +149,12 @@ function boot() {
 function initLightbox() {
     const overlay = document.createElement('div');
     overlay.id = 'img-lightbox';
-    overlay.hidden = true;
     const img = document.createElement('img');
     overlay.appendChild(img);
     document.body.appendChild(overlay);
+
+    const openLB = (src, alt) => { img.src = src; img.alt = alt; overlay.classList.add('open'); };
+    const closeLB = () => overlay.classList.remove('open');
 
     container.addEventListener('click', e => {
         if (!e.altKey) return;
@@ -158,13 +162,11 @@ function initLightbox() {
         if (!t) return;
         e.preventDefault();
         e.stopPropagation();
-        img.src = t.src;
-        img.alt = t.alt;
-        overlay.hidden = false;
+        openLB(t.src, t.alt);
     });
-    overlay.addEventListener('click', () => { overlay.hidden = true; });
+    overlay.addEventListener('click', closeLB);
     document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && !overlay.hidden) { overlay.hidden = true; e.stopPropagation(); }
+        if (e.key === 'Escape' && overlay.classList.contains('open')) { closeLB(); e.stopPropagation(); }
     });
 }
 
