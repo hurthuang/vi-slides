@@ -272,8 +272,11 @@ const MODULES = [
     { id: 'promo-t-life',     group: 'promo', name: '學業之外',             desc: '協助目標、心態、聯絡資訊',                       chapter: 'promo-t-ch' },
     // 學分班
     { id: 'lxb-ch1',           group: 'lxb', name: '第一週：視覺障礙與功能性視覺', desc: '章節標題頁', type: 'chapter' },
-    { id: 'lxb-vi-definition', group: 'lxb', name: '視覺障礙定義與鑑定',   desc: '鑑定辦法條文、Peek Acuity、視野圖、視障資源',         chapter: 'lxb-ch1' },
-    // 第一週：共用 viat 模組（眼疾/手術/CVI）— 依 0711 投影片順序
+    // 第一週：共用 viat 模組（定義/視野/資源/眼疾）— 依 0711 投影片順序
+    { id: 'lxb-ch1-definition',  group: 'lxb', name: '視覺障礙定義與分類',  desc: '→ viat-definition',            chapter: 'lxb-ch1' },
+    { id: 'lxb-vi-definition',   group: 'lxb', name: 'Peek Acuity',         desc: 'Peek Acuity 視力測試 APP（三張）', chapter: 'lxb-ch1' },
+    { id: 'lxb-ch1-vision-field',group: 'lxb', name: '視野圖',              desc: '→ viat-vision-field',          chapter: 'lxb-ch1' },
+    { id: 'lxb-ch1-resources',   group: 'lxb', name: '視障相關資源',         desc: '→ viat-resources',             chapter: 'lxb-ch1' },
     { id: 'lxb-ch1-eye-anatomy',    group: 'lxb', name: '眼球結構',           desc: '→ viat-eye-anatomy',           chapter: 'lxb-ch1' },
     { id: 'lxb-ch1-eye-conditions', group: 'lxb', name: '眼疾視覺模擬',       desc: '→ viat-eye-conditions',        chapter: 'lxb-ch1' },
     { id: 'lxb-eye-sim-app',   group: 'lxb', name: '視覺損傷模擬軟體',     desc: 'ViaOpta Simulator / Impairment Simulator',          chapter: 'lxb-ch1' },
@@ -406,10 +409,13 @@ function toggleGroup(grp) {
 
 // ── lxb→viat 別名對照（同一份 module 檔案，lxb 側用獨立 id 勾選） ──
 const MODULES_SRC = {
-    'lxb-ch1-eye-anatomy':    'viat-eye-anatomy',
-    'lxb-ch1-eye-conditions': 'viat-eye-conditions',
-    'lxb-ch1-eye-treatment':  'viat-eye-treatment',
-    'lxb-ch1-cvi':            'viat-cvi',
+    'lxb-ch1-definition':    'viat-definition',
+    'lxb-ch1-vision-field':  'viat-vision-field',
+    'lxb-ch1-resources':     'viat-resources',
+    'lxb-ch1-eye-anatomy':   'viat-eye-anatomy',
+    'lxb-ch1-eye-conditions':'viat-eye-conditions',
+    'lxb-ch1-eye-treatment': 'viat-eye-treatment',
+    'lxb-ch1-cvi':           'viat-cvi',
     'lxb-ch2-magnifier':        'viat-magnifier',
     'lxb-ch2-cctv-portable':    'viat-cctv-portable',
     'lxb-ch2-cctv-desktop':     'viat-cctv-desktop',
