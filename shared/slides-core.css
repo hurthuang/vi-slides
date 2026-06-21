@@ -125,7 +125,7 @@
 
 /* ── 結尾頁 ── */
 .slide-end {
-    background: linear-gradient(140deg, #0d47a1 0%, #1565c0 60%, #006064 100%) !important;
+    background: linear-gradient(140deg, #3a5068 0%, #546e7a 55%, #607b6c 100%) !important;
     color: #fff !important;
     display: flex; flex-direction: column; justify-content: center;
 }
