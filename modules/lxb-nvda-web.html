@@ -1,3 +1,36 @@
+<section role="region" aria-label="NVDA 焦點介紹">
+    <h2>NVDA 焦點</h2>
+    <div class="two-col">
+        <div class="col-box">
+            <h3>焦點種類</h3>
+            <ul style="font-size:.82em;line-height:1.9">
+                <li>鍵盤焦點</li>
+                <li>滑鼠焦點</li>
+            </ul>
+        </div>
+        <div class="col-box accent-green">
+            <h3>焦點切換</h3>
+            <ul style="font-size:.78em;line-height:1.8">
+                <li>NVDA + 6：檢閱游標跟隨編輯游標</li>
+                <li>NVDA + 7：導航器物件跟隨系統焦點</li>
+                <li>NVDA + 8：自動將系統焦點移至可聚焦項目</li>
+                <li>NVDA + M：跟隨鼠標朗讀</li>
+                <li>Ctrl + NVDA + T：點字跟隨</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section role="region" aria-label="NVDA 焦點特殊情況">
+    <h2>NVDA 焦點</h2>
+    <p style="font-size:.8em;margin-bottom:.4em">特殊情況（九宮格，NumLock 關的模式下）</p>
+    <table style="font-size:.78em;width:100%;border-collapse:collapse">
+        <tr><td style="padding:4px 8px;border:1px solid #ccc;width:14em">0 + *（星號）</td><td style="padding:4px 8px;border:1px solid #ccc">焦點移到滑鼠指標所在處（筆電：NVDA + Shift + M）</td></tr>
+        <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc">0 + /（斜線）</td><td style="padding:4px 8px;border:1px solid #ccc">滑鼠指標移到焦點所在處（筆電：NVDA + Shift + N）</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #ccc">0 + −（減號）</td><td style="padding:4px 8px;border:1px solid #ccc">焦點移到系統焦點所在處</td></tr>
+    </table>
+</section>
+
 <section role="region" aria-label="NVDA 焦點影片">
     <h2>淺談 NVDA 操作焦點</h2>
     <iframe data-src="https://www.youtube.com/embed/JTDShiOO11c"
@@ -6,61 +39,56 @@
     </iframe>
 </section>
 
-<section role="region" aria-label="NVDA 焦點介紹">
-    <h2>NVDA 焦點</h2>
-    <div class="two-col">
-        <div class="col-box">
-            <h3>焦點種類</h3>
-            <ul>
-                <li>鍵盤焦點</li>
-                <li>滑鼠焦點</li>
-            </ul>
-        </div>
-        <div class="col-box accent-green">
-            <h3>特殊情況</h3>
-            <p style="font-size:.78em">九宮格（NumLock 關）：<br>0 + * → 焦點移至滑鼠指標處</p>
-        </div>
-    </div>
-</section>
-
-
 <section role="region" aria-label="NVDA 網頁瀏覽基本">
     <h2>使用 NVDA 瀏覽網頁</h2>
-    <div class="two-col">
-        <div class="col-box">
-            <h3>基本瀏覽</h3>
-            <ul style="font-size:.8em">
-                <li>方向鍵上下：逐行瀏覽</li>
-                <li>Tab：跳到下一個連結／按鈕</li>
-                <li>Enter：開啟連結</li>
-            </ul>
-        </div>
-        <div class="col-box accent-green">
-            <h3>切換模式</h3>
-            <ul style="font-size:.8em">
-                <li>瀏覽模式 ↔ 焦點模式</li>
-                <li>NVDA + Space</li>
-            </ul>
-        </div>
-    </div>
+    <p style="font-size:.82em;margin-bottom:.4em">基本的網頁瀏覽：</p>
+    <ul style="font-size:.82em;line-height:2">
+        <li>方向鍵上下：網頁物件跳轉</li>
+        <li>Tab ／ Shift + Tab：跳轉至下一個 ／ 上一個可互動項目</li>
+        <li>空白鍵：選取</li>
+        <li>Enter：執行</li>
+    </ul>
 </section>
 
-<section role="region" aria-label="NVDA 單鍵瀏覽 標題 圖片">
-    <h2>單鍵瀏覽</h2>
+<section role="region" aria-label="NVDA 單鍵瀏覽 1">
+    <h2>單鍵瀏覽（加 Shift 往回跳）</h2>
     <table style="font-size:.75em;width:100%;border-collapse:collapse">
         <thead>
             <tr style="background:#e3f2fd">
                 <th style="padding:4px 8px;border:1px solid #90caf9;width:3em">鍵</th>
-                <th style="padding:4px 8px;border:1px solid #90caf9">跳轉目標（加 Shift 往回）</th>
+                <th style="padding:4px 8px;border:1px solid #90caf9">跳轉目標</th>
             </tr>
         </thead>
         <tbody>
-            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">H</td><td style="padding:4px 8px;border:1px solid #ccc">標題</td></tr>
-            <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">G</td><td style="padding:4px 8px;border:1px solid #ccc">圖片</td></tr>
-            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">B</td><td style="padding:4px 8px;border:1px solid #ccc">按鈕</td></tr>
-            <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">K</td><td style="padding:4px 8px;border:1px solid #ccc">連結</td></tr>
-            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">E</td><td style="padding:4px 8px;border:1px solid #ccc">編輯欄</td></tr>
-            <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">T</td><td style="padding:4px 8px;border:1px solid #ccc">表格</td></tr>
+            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">H</td><td style="padding:4px 8px;border:1px solid #ccc">標題 (heading)</td></tr>
+            <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">L</td><td style="padding:4px 8px;border:1px solid #ccc">清單 (list)</td></tr>
+            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">I</td><td style="padding:4px 8px;border:1px solid #ccc">清單項目 (list item)</td></tr>
+            <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">T</td><td style="padding:4px 8px;border:1px solid #ccc">表格 (table)</td></tr>
+            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">K</td><td style="padding:4px 8px;border:1px solid #ccc">連結 (link)</td></tr>
+            <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">E</td><td style="padding:4px 8px;border:1px solid #ccc">編輯區 (edit field)</td></tr>
+            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">B</td><td style="padding:4px 8px;border:1px solid #ccc">按鈕 (button)</td></tr>
+            <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">X</td><td style="padding:4px 8px;border:1px solid #ccc">核取方塊 (checkbox)</td></tr>
+            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">C</td><td style="padding:4px 8px;border:1px solid #ccc">下拉式方塊 (combo box)</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<section role="region" aria-label="NVDA 單鍵瀏覽 2">
+    <h2>單鍵瀏覽（續）</h2>
+    <table style="font-size:.75em;width:100%;border-collapse:collapse">
+        <thead>
+            <tr style="background:#e3f2fd">
+                <th style="padding:4px 8px;border:1px solid #90caf9;width:3em">鍵</th>
+                <th style="padding:4px 8px;border:1px solid #90caf9">跳轉目標</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">G</td><td style="padding:4px 8px;border:1px solid #ccc">圖片 (graphic)</td></tr>
+            <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">D</td><td style="padding:4px 8px;border:1px solid #ccc">地標 (landmark)</td></tr>
+            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">O</td><td style="padding:4px 8px;border:1px solid #ccc">嵌入式物件（音訊、影片、應用程式等）</td></tr>
+            <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">1–6</td><td style="padding:4px 8px;border:1px solid #ccc">第 1 至第 6 級標題</td></tr>
+            <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">，</td><td style="padding:4px 8px;border:1px solid #ccc">跳出清單或表格</td></tr>
+            <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">NVDA + F7</td><td style="padding:4px 8px;border:1px solid #ccc">元件清單對話框</td></tr>
         </tbody>
     </table>
 </section>
@@ -88,10 +116,11 @@
     <h2>YouTube 快速鍵</h2>
     <table style="font-size:.78em;width:100%;border-collapse:collapse">
         <tr><td style="padding:4px 8px;border:1px solid #ccc;width:4em;text-align:center">K</td><td style="padding:4px 8px;border:1px solid #ccc">切換播放 ／ 暫停</td></tr>
-        <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">J / L</td><td style="padding:4px 8px;border:1px solid #ccc">向後 ／ 前跳 10 秒</td></tr>
-        <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">← / →</td><td style="padding:4px 8px;border:1px solid #ccc">向後 ／ 前跳 5 秒</td></tr>
-        <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">P / N</td><td style="padding:4px 8px;border:1px solid #ccc">上 ／ 下一部影片</td></tr>
-        <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">F</td><td style="padding:4px 8px;border:1px solid #ccc">全螢幕</td></tr>
-        <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">C</td><td style="padding:4px 8px;border:1px solid #ccc">字幕</td></tr>
+        <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">J ／ L</td><td style="padding:4px 8px;border:1px solid #ccc">向後 ／ 前跳 10 秒</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">P ／ N</td><td style="padding:4px 8px;border:1px solid #ccc">上 ／ 下一部影片</td></tr>
+        <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">&lt; ／ &gt;</td><td style="padding:4px 8px;border:1px solid #ccc">調慢 ／ 快播放速度（Shift+, ／ Shift+.）</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">0–9</td><td style="padding:4px 8px;border:1px solid #ccc">跳轉到影片的百分比（主鍵盤數字鍵）</td></tr>
+        <tr style="background:#f9f9f9"><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">C</td><td style="padding:4px 8px;border:1px solid #ccc">啟用 ／ 關閉字幕</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #ccc;text-align:center">M</td><td style="padding:4px 8px;border:1px solid #ccc">靜音</td></tr>
     </table>
 </section>
