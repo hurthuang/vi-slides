@@ -126,19 +126,6 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
     <div class="group-content" id="content-ueb"></div>
 </div>
 
-<div class="group" id="group-common">
-    <div class="group-header" onclick="toggleGroup('common')">
-        <span class="drag-handle group-drag-handle" aria-hidden="true">⠿</span>
-        <button class="toggle-btn" id="tb-common" aria-expanded="false">▶</button>
-        <h2>共用頁面</h2>
-        <label class="select-all-label" onclick="event.stopPropagation()">
-            <input type="checkbox" id="sa-common"> 全選
-        </label>
-    </div>
-    <div class="group-content" id="content-common"></div>
-</div>
-
-
 <div class="group" id="group-promo" style="border-color:#0288d1">
     <div class="group-header" onclick="toggleGroup('promo')">
         <span class="drag-handle group-drag-handle" aria-hidden="true">⠿</span>
@@ -162,6 +149,19 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
         </label>
     </div>
     <div class="group-content" id="content-lxb"></div>
+</div>
+
+
+<div class="group" id="group-common">
+    <div class="group-header" onclick="toggleGroup('common')">
+        <span class="drag-handle group-drag-handle" aria-hidden="true">⠿</span>
+        <button class="toggle-btn" id="tb-common" aria-expanded="false">▶</button>
+        <h2>共用頁面</h2>
+        <label class="select-all-label" onclick="event.stopPropagation()">
+            <input type="checkbox" id="sa-common"> 全選
+        </label>
+    </div>
+    <div class="group-content" id="content-common"></div>
 </div>
 
 </div><!-- #groups-container -->
