@@ -456,7 +456,7 @@ MODULES.forEach(m => {
                 if (memberCb) memberCb.checked = this.checked;
             });
             syncGroupSelectAll(m.group);
-            syncUrl();
+            syncUrl(); syncIdxSelection();
         });
     } else {
         const label = document.createElement('label');
@@ -485,13 +485,13 @@ groupIds.forEach(grp => {
         document.querySelectorAll(`#content-${grp} input[name=mod]`).forEach(cb => {
             cb.checked = sa.checked;
         });
-        syncUrl();
+        syncUrl(); syncIdxSelection();
     });
 
     document.getElementById('content-' + grp).addEventListener('change', e => {
         if (e.target.name !== 'mod') return;
         syncGroupSelectAll(grp);
-        syncUrl();
+        syncUrl(); syncIdxSelection();
     });
 });
 
@@ -759,9 +759,6 @@ function syncIdxSelection() {
         tr.classList.toggle('idx-selected', checked.has(id));
     });
 }
-document.getElementById('groups-container').addEventListener('change', e => {
-    if (e.target.name === 'mod') syncIdxSelection();
-});
 
 // ── Modal 事件 ────────────────────────────────────────────
 document.getElementById('mod-modal').addEventListener('click', e => {
