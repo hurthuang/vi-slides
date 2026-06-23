@@ -67,6 +67,14 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 #btn-copy:hover { background: #c8e6c9; }
 #btn-pdf { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
 #btn-pdf:hover { background: #ffe0b2; }
+.mod-preview {
+    flex-shrink: 0; align-self: center; margin-left: auto;
+    padding: .13em .48em; font-size: .76em; line-height: 1.5;
+    color: #1565c0; background: #e3f2fd;
+    border: 1px solid #90caf9; border-radius: 4px;
+    text-decoration: none; white-space: nowrap;
+}
+.mod-preview:hover { background: #bbdefb; }
 .pdf-hint { font-size: .8em; color: #888; margin-top: .9em; padding: .6em .8em;
     background: #fff8e1; border-radius: 6px; border-left: 3px solid #ffd54f; line-height: 1.5; }
 #status { font-size: .85em; color: #555; padding: .4em 0; }
@@ -337,6 +345,21 @@ MODULES.forEach(m => {
     }
 });
 
+// ── 模組單頁預覽連結 ─────────────────────────────────────
+const PREVIEW_BASE = location.href.split('?')[0].replace('compose.html', 'preview.html');
+function makePreviewLink(modId) {
+    const srcId = MODULES_SRC[modId] || modId;
+    const a = document.createElement('a');
+    a.className = 'mod-preview';
+    a.href = PREVIEW_BASE + '?m=' + srcId;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = '▶';
+    a.title = '單獨預覽此模組';
+    a.addEventListener('click', e => e.stopPropagation());
+    return a;
+}
+
 // ── 建立勾選介面 ──────────────────────────────────────────
 MODULES.forEach(m => {
     const cel = contentEls[m.group];
@@ -349,6 +372,7 @@ MODULES.forEach(m => {
         lbl.innerHTML = `<input type="checkbox" name="mod" value="${m.id}">
             <span class="ch-name">${m.name}</span>`;
         wrap.appendChild(lbl);
+        wrap.appendChild(makePreviewLink(m.id));
         cel.appendChild(wrap);
 
         // 勾選章節時同步章節內所有模組
@@ -366,6 +390,7 @@ MODULES.forEach(m => {
         if (m.chapter) label.classList.add('ch-mod');
         label.innerHTML = `<input type="checkbox" name="mod" value="${m.id}">
             <span><strong>${m.name}</strong><br><span class="mod-desc">${m.desc}</span></span>`;
+        label.appendChild(makePreviewLink(m.id));
         cel.appendChild(label);
     }
 });
