@@ -345,6 +345,23 @@ MODULES.forEach(m => {
     }
 });
 
+// ── lxb→viat 別名對照（同一份 module 檔案，lxb 側用獨立 id 勾選） ──
+const MODULES_SRC = {
+    'lxb-ch1-definition':    'viat-definition',
+    'lxb-ch1-vision-field':  'viat-vision-field',
+    'lxb-ch1-resources':     'viat-resources',
+    'lxb-ch1-eye-anatomy':   'viat-eye-anatomy',
+    'lxb-ch1-eye-conditions':'viat-eye-conditions',
+    'lxb-ch1-eye-treatment': 'viat-eye-treatment',
+    'lxb-ch1-cvi':           'viat-cvi',
+    'lxb-ch2-magnifier':        'viat-magnifier',
+    'lxb-ch2-cctv-portable':    'viat-cctv-portable',
+    'lxb-ch2-cctv-desktop':     'viat-cctv-desktop',
+    'lxb-ch2-cctv-headmounted': 'viat-cctv-headmounted',
+    'lxb-ch2-ocr-tts':          'viat-ocr-tts',
+    'lxb-ch2-braille-devices':  'viat-braille-devices',
+};
+
 // ── 模組單頁預覽連結 ─────────────────────────────────────
 const PREVIEW_BASE = location.href.split('?')[0].replace('compose.html', 'preview.html');
 function makePreviewLink(modId) {
@@ -430,23 +447,6 @@ function toggleGroup(grp) {
     btn.textContent = isOpen ? '▼' : '▶';
     btn.setAttribute('aria-expanded', isOpen);
 }
-
-// ── lxb→viat 別名對照（同一份 module 檔案，lxb 側用獨立 id 勾選） ──
-const MODULES_SRC = {
-    'lxb-ch1-definition':    'viat-definition',
-    'lxb-ch1-vision-field':  'viat-vision-field',
-    'lxb-ch1-resources':     'viat-resources',
-    'lxb-ch1-eye-anatomy':   'viat-eye-anatomy',
-    'lxb-ch1-eye-conditions':'viat-eye-conditions',
-    'lxb-ch1-eye-treatment': 'viat-eye-treatment',
-    'lxb-ch1-cvi':           'viat-cvi',
-    'lxb-ch2-magnifier':        'viat-magnifier',
-    'lxb-ch2-cctv-portable':    'viat-cctv-portable',
-    'lxb-ch2-cctv-desktop':     'viat-cctv-desktop',
-    'lxb-ch2-cctv-headmounted': 'viat-cctv-headmounted',
-    'lxb-ch2-ocr-tts':          'viat-ocr-tts',
-    'lxb-ch2-braille-devices':  'viat-braille-devices',
-};
 
 // ── URL 同步 ──────────────────────────────────────────────
 function getSelected() {
