@@ -100,7 +100,9 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
     margin: .85em 0 .18em; padding-bottom: .15em; border-bottom: 1px solid #eceff1; }
 .idx-table { width: 100%; border-collapse: collapse; font-size: .79em; }
 .idx-table tr { cursor: pointer; }
+.idx-table tr.idx-selected td { background: #e8f5e9; }
 .idx-table tr:hover td, .idx-table tr.idx-active td { background: #e8f0fe; }
+.idx-table tr.idx-selected:hover td, .idx-table tr.idx-selected.idx-active td { background: #c8e6c9; }
 .idx-table td { padding: .2em .45em .2em 0; vertical-align: middle; }
 .idx-id { font-family: "Consolas","Courier New",monospace; color: #1565c0; white-space: nowrap; }
 .idx-name { color: #333; width: 100%; }
@@ -747,6 +749,20 @@ initDragDrop();
     }
 })();
 
+// ── 左欄勾選同步右欄高亮 ──────────────────────────────────
+const _idxRowMap = {};
+function syncIdxSelection() {
+    const checked = new Set(
+        Array.from(document.querySelectorAll('input[name="mod"]:checked')).map(c => c.value)
+    );
+    Object.entries(_idxRowMap).forEach(([id, tr]) => {
+        tr.classList.toggle('idx-selected', checked.has(id));
+    });
+}
+document.getElementById('groups-container').addEventListener('change', e => {
+    if (e.target.name === 'mod') syncIdxSelection();
+});
+
 // ── Modal 事件 ────────────────────────────────────────────
 document.getElementById('mod-modal').addEventListener('click', e => {
     if (e.target.id === 'mod-modal') closeModal();
@@ -788,8 +804,10 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
             activeRow = tr; tr.classList.add('idx-active');
             openModal(m.id);
         });
+        _idxRowMap[m.id] = tr;
         tbody.appendChild(tr);
     });
+    syncIdxSelection();
 })();
 </script>
 </body>
