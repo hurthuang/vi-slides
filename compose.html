@@ -11,15 +11,24 @@ body { font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
     height: 100dvh; overflow: hidden; }
 #compose-layout { display: flex; height: 100dvh; }
 #compose-left { width: 420px; flex-shrink: 0; overflow-y: auto; padding: 1.5em 1em; }
-#compose-right { flex: 1; display: flex; flex-direction: column; background: #111; min-width: 0; border-left: 2px solid #333; }
-#compose-right-bar { padding: .35em .9em; background: #1c1c1c; color: #888;
-    font-size: .78em; font-family: "Consolas","Courier New",monospace;
-    border-bottom: 1px solid #2a2a2a; flex-shrink: 0;
-    display: flex; align-items: center; gap: .6em; }
-#compose-right-span { flex: 1; }
-#compose-right-newtab { color: #6b9dce; text-decoration: none; font-size: 1em; }
-#compose-right-newtab:hover { color: #90c2f0; }
-#compose-right-frame { flex: 1; border: 0; width: 100%; display: block; }
+#compose-right { flex: 1; overflow-y: auto; min-width: 0; border-left: 2px solid #dee2e6; background: #f8fafb; }
+#compose-right-title { padding: .65em 1.2em; background: #fff; border-bottom: 1px solid #e0e0e0;
+    font-size: .85em; font-weight: 700; color: #455a64; position: sticky; top: 0; z-index: 1; }
+#idx-panel-body { padding: .1em 1em .8em; }
+/* Modal 預覽 */
+#mod-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.78);
+    z-index: 9999; align-items: center; justify-content: center; }
+#mod-modal.open { display: flex; }
+#mod-modal-inner { width: min(93vw, 1280px); height: 89vh; background: #111; border-radius: 10px;
+    overflow: hidden; display: flex; flex-direction: column; }
+#mod-modal-title { padding: .35em .9em; background: #1c1c1c; color: #bbb; font-size: .8em;
+    font-family: "Consolas","Courier New",monospace; border-bottom: 1px solid #333;
+    flex-shrink: 0; display: flex; align-items: center; gap: .6em; }
+#mod-modal-label { flex: 1; }
+#mod-modal-close { background: rgba(255,255,255,.1); color: #bbb; border: none;
+    border-radius: 4px; padding: .1em .5em; font-size: 1em; cursor: pointer; line-height: 1.6; }
+#mod-modal-close:hover { background: rgba(255,255,255,.22); color: #fff; }
+#mod-modal-frame { width: 100%; flex: 1; border: 0; display: block; }
 h1 { font-size: 1.4em; color: #1b5e20; margin-bottom: .1em; }
 .subtitle { color: #666; font-size: .9em; margin-bottom: 1.5em; }
 .group { background: #fff; border-radius: 8px; margin-bottom: 1em;
@@ -87,15 +96,6 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
     text-decoration: none; white-space: nowrap;
 }
 .mod-preview:hover { background: #bbdefb; }
-/* 模組索引 */
-#mod-index { margin-top: 1.2em; background: #fff; border-radius: 8px;
-    border-left: 4px solid #78909c; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-#mod-index summary { padding: .7em 1.2em; cursor: pointer; font-size: .88em;
-    font-weight: 700; color: #455a64; user-select: none; list-style: none; }
-#mod-index summary::-webkit-details-marker { display: none; }
-#mod-index summary::before { content: '▸  '; }
-#mod-index[open] summary::before { content: '▾  '; }
-#mod-index-body { padding: .1em 1em .8em; }
 .idx-group { font-size: .76em; font-weight: 700; color: #546e7a;
     margin: .85em 0 .18em; padding-bottom: .15em; border-bottom: 1px solid #eceff1; }
 .idx-table { width: 100%; border-collapse: collapse; font-size: .79em; }
@@ -237,20 +237,21 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
     </div>
 </details>
 
-<details id="mod-index">
-    <summary>模組索引 — 編號對照表</summary>
-    <div id="mod-index-body"></div>
-</details>
-
 </div><!-- #compose-left -->
 <div id="compose-right">
-    <div id="compose-right-bar">
-        <span id="compose-right-span">← 點 ▶ 預覽模組</span>
-        <a id="compose-right-newtab" href="#" target="_blank" rel="noopener" title="在新分頁開啟">↗</a>
-    </div>
-    <iframe id="compose-right-frame" src="" allowfullscreen></iframe>
+    <div id="compose-right-title">模組索引 — JS 編號對照</div>
+    <div id="idx-panel-body"></div>
 </div>
 </div><!-- #compose-layout -->
+<div id="mod-modal" role="dialog" aria-modal="true">
+    <div id="mod-modal-inner">
+        <div id="mod-modal-title">
+            <span id="mod-modal-label"></span>
+            <button id="mod-modal-close" title="關閉（Esc）">✕</button>
+        </div>
+        <iframe id="mod-modal-frame" src="" allowfullscreen></iframe>
+    </div>
+</div>
 
 <script>
 // ── 所有可用模組 ──────────────────────────────────────────
@@ -410,25 +411,23 @@ const MODULES_SRC = {
 
 // ── 模組單頁預覽 ──────────────────────────────────────────
 const PREVIEW_BASE = location.href.split('?')[0].replace('compose.html', 'preview.html');
-const _rightSpan = document.getElementById('compose-right-span');
-const _rightLink = document.getElementById('compose-right-newtab');
-const _rightFrame = document.getElementById('compose-right-frame');
-function loadPreview(url, label) {
-    _rightSpan.textContent = label;
-    _rightLink.href = url;
-    _rightFrame.src = url;
+function openModal(modId) {
+    const srcId = MODULES_SRC[modId] || modId;
+    document.getElementById('mod-modal-label').textContent = srcId;
+    document.getElementById('mod-modal-frame').src = PREVIEW_BASE + '?m=' + srcId;
+    document.getElementById('mod-modal').classList.add('open');
+}
+function closeModal() {
+    document.getElementById('mod-modal').classList.remove('open');
+    document.getElementById('mod-modal-frame').src = '';
 }
 function makePreviewLink(modId) {
-    const srcId = MODULES_SRC[modId] || modId;
     const btn = document.createElement('button');
     btn.className = 'mod-preview';
     btn.type = 'button';
     btn.textContent = '▶';
     btn.title = '預覽';
-    btn.addEventListener('click', e => {
-        e.stopPropagation();
-        loadPreview(PREVIEW_BASE + '?m=' + srcId, srcId);
-    });
+    btn.addEventListener('click', e => { e.stopPropagation(); openModal(modId); });
     return btn;
 }
 
@@ -564,8 +563,7 @@ function showStatus(msg, ms = 2500) {
 document.getElementById('btn-preview').addEventListener('click', () => {
     const sel = getSelected();
     if (!sel.length) { showStatus('請至少勾選一個模組'); return; }
-    const url = buildPreviewUrl(sel);
-    loadPreview(url, sel.map(id => MODULES_SRC[id] || id).join(', '));
+    window.open(buildPreviewUrl(sel), '_blank');
 });
 
 document.getElementById('btn-copy').addEventListener('click', () => {
@@ -749,10 +747,17 @@ initDragDrop();
     }
 })();
 
-// ── 模組索引表 ────────────────────────────────────────────
+// ── Modal 事件 ────────────────────────────────────────────
+document.getElementById('mod-modal').addEventListener('click', e => {
+    if (e.target.id === 'mod-modal') closeModal();
+});
+document.getElementById('mod-modal-close').addEventListener('click', closeModal);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── 右欄模組索引表 ────────────────────────────────────────
 (function buildModIndex() {
-    const body = document.getElementById('mod-index-body');
-    if (!body) return;
+    const panel = document.getElementById('idx-panel-body');
+    if (!panel) return;
     const groupLabel = {
         vitools: 'vi-tools 工具', nvda: 'NVDA 附加元件',
         viat: '視障生學習與輔助科技', ueb: 'UEB 規則介紹',
@@ -765,12 +770,12 @@ initDragDrop();
             const h = document.createElement('div');
             h.className = 'idx-group';
             h.textContent = groupLabel[m.group] || m.group;
-            body.appendChild(h);
+            panel.appendChild(h);
             const tbl = document.createElement('table');
             tbl.className = 'idx-table';
             tbody = document.createElement('tbody');
             tbl.appendChild(tbody);
-            body.appendChild(tbl);
+            panel.appendChild(tbl);
         }
         const srcId = MODULES_SRC[m.id] || m.id;
         const tr = document.createElement('tr');
@@ -781,7 +786,7 @@ initDragDrop();
         tr.addEventListener('click', () => {
             if (activeRow) activeRow.classList.remove('idx-active');
             activeRow = tr; tr.classList.add('idx-active');
-            loadPreview(PREVIEW_BASE + '?m=' + srcId, srcId);
+            openModal(m.id);
         });
         tbody.appendChild(tr);
     });
