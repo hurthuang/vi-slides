@@ -110,11 +110,18 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 #mod-index summary::-webkit-details-marker { display: none; }
 #mod-index summary::before { content: '▸  '; }
 #mod-index[open] summary::before { content: '▾  '; }
-#mod-index-body { padding: .1em 1.2em .9em; }
+#mod-index-wrap { display: grid; grid-template-columns: 300px 1fr; min-height: 65vh; max-height: 82vh; }
+#mod-index-list { overflow-y: auto; padding: .2em 1em .9em; border-right: 1px solid #dee2e6; }
+#mod-index-frame-wrap { display: flex; flex-direction: column; background: #111; border-radius: 0 0 8px 0; }
+#mod-index-frame-label { padding: .32em .9em; background: #1c1c1c; color: #888;
+    font-size: .78em; font-family: "Consolas","Courier New",monospace;
+    border-bottom: 1px solid #2a2a2a; flex-shrink: 0; min-height: 1.9em; }
+#mod-index-frame { flex: 1; border: 0; width: 100%; display: block; }
 .idx-group { font-size: .76em; font-weight: 700; color: #546e7a;
     margin: .85em 0 .18em; padding-bottom: .15em; border-bottom: 1px solid #eceff1; }
 .idx-table { width: 100%; border-collapse: collapse; font-size: .79em; }
-.idx-table tr:hover td { background: #f0f7ff; }
+.idx-table tr { cursor: pointer; }
+.idx-table tr:hover td, .idx-table tr.idx-active td { background: #e8f0fe; }
 .idx-table td { padding: .2em .45em .2em 0; vertical-align: middle; }
 .idx-id { font-family: "Consolas","Courier New",monospace; color: #1565c0; white-space: nowrap; }
 .idx-name { color: #333; width: 100%; }
@@ -251,7 +258,13 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 
 <details id="mod-index">
     <summary>模組索引 — 編號對照表</summary>
-    <div id="mod-index-body"></div>
+    <div id="mod-index-wrap">
+        <div id="mod-index-list"></div>
+        <div id="mod-index-frame-wrap">
+            <div id="mod-index-frame-label">← 點左側列表中的模組預覽</div>
+            <iframe id="mod-index-frame" src="" allowfullscreen></iframe>
+        </div>
+    </div>
 </details>
 
 <div id="mod-modal" role="dialog" aria-modal="true">
@@ -765,10 +778,23 @@ document.getElementById('mod-modal').addEventListener('click', e => {
 document.getElementById('mod-modal-close').addEventListener('click', closeModal);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// ── 模組索引表 ────────────────────────────────────────────
+// ── 模組索引表（左右並列） ────────────────────────────────
 (function buildModIndex() {
-    const body = document.getElementById('mod-index-body');
-    if (!body) return;
+    const list = document.getElementById('mod-index-list');
+    if (!list) return;
+    const frameLabel = document.getElementById('mod-index-frame-label');
+    const frame = document.getElementById('mod-index-frame');
+    let activeRow = null;
+
+    function loadIndexPreview(modId, tr) {
+        const srcId = MODULES_SRC[modId] || modId;
+        frameLabel.textContent = srcId;
+        frame.src = PREVIEW_BASE + '?m=' + srcId;
+        if (activeRow) activeRow.classList.remove('idx-active');
+        activeRow = tr;
+        tr.classList.add('idx-active');
+    }
+
     const groupLabel = {
         vitools: 'vi-tools 工具', nvda: 'NVDA 附加元件',
         viat: '視障生學習與輔助科技', ueb: 'UEB 規則介紹',
@@ -781,24 +807,20 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
             const h = document.createElement('div');
             h.className = 'idx-group';
             h.textContent = groupLabel[m.group] || m.group;
-            body.appendChild(h);
+            list.appendChild(h);
             const tbl = document.createElement('table');
             tbl.className = 'idx-table';
             tbody = document.createElement('tbody');
             tbl.appendChild(tbody);
-            body.appendChild(tbl);
+            list.appendChild(tbl);
         }
         const srcId = MODULES_SRC[m.id] || m.id;
         const tr = document.createElement('tr');
+        tr.title = '點擊預覽';
         const tdId   = document.createElement('td'); tdId.className = 'idx-id';   tdId.textContent = srcId;
         const tdName = document.createElement('td'); tdName.className = 'idx-name'; tdName.textContent = m.name;
-        const tdBtn  = document.createElement('td');
-        const btn = document.createElement('button');
-        btn.className = 'mod-preview'; btn.type = 'button';
-        btn.textContent = '▶'; btn.title = '預覽';
-        btn.addEventListener('click', () => openModal(m.id));
-        tdBtn.appendChild(btn);
-        tr.append(tdId, tdName, tdBtn);
+        tr.append(tdId, tdName);
+        tr.addEventListener('click', () => loadIndexPreview(m.id, tr));
         tbody.appendChild(tr);
     });
 })();
