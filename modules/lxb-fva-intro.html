@@ -18,34 +18,43 @@
 
 <section role="region" aria-label="學習媒介評量流程">
     <h2>學習媒介評量</h2>
-    <div style="display:flex;align-items:stretch;gap:0;justify-content:center;padding:.4em 0">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:.4em">
-            <div style="background:#1565c0;color:#fff;border-radius:8px;padding:.55em 1.8em;font-size:.88em;font-weight:600;text-align:center">
-                功能性視覺評估
+    <div style="display:flex;justify-content:center;gap:1.2em;align-items:flex-start;font-size:.82em;margin-top:.3em">
+        <!-- 主流程（直向） -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:.2em">
+            <div style="background:#e3f2fd;border:1.5px solid #1565c0;border-radius:6px;padding:.45em 1.4em;text-align:center">
+                <div style="font-weight:700;color:#1565c0">功能性視覺評估</div>
+                <div style="font-size:.85em;color:#444;margin-top:.15em">了解視障者剩餘視力的使用情形</div>
             </div>
-            <div style="font-size:.78em;color:#1565c0;border:1.5px solid #1565c0;border-radius:6px;padding:.35em 1.2em;text-align:center;background:#e8eef8">
-                了解視障者剩餘視力的使用情形
+            <div style="font-size:1.4em;color:#666;line-height:1">↓</div>
+            <div style="background:#e8f5e9;border:1.5px solid #2e7d32;border-radius:6px;padding:.45em 1.4em;text-align:center">
+                <div style="font-weight:700;color:#2e7d32">學習媒介評量</div>
+                <div style="font-size:.85em;color:#444;margin-top:.15em">尋找最適的閱讀書寫方式</div>
+            </div>
+            <div style="font-size:1.4em;color:#666;line-height:1">↓</div>
+            <!-- 菱形節點 -->
+            <div style="position:relative;width:9em;height:4.2em;display:flex;align-items:center;justify-content:center">
+                <div style="position:absolute;width:4em;height:4em;background:#fff;border:1.5px solid #1565c0;transform:rotate(45deg)"></div>
+                <div style="position:relative;font-weight:700;color:#1565c0;font-size:.88em;text-align:center;z-index:1">最佳感官能力</div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:0;position:relative;width:13em;justify-content:center">
+                <div style="position:absolute;top:0;left:50%;width:0;border-left:1.5px solid #aaa;height:1.1em"></div>
+                <div style="position:absolute;top:1em;left:1.5em;right:1.5em;border-top:1.5px solid #aaa"></div>
+                <div style="position:absolute;top:1em;left:1.5em;width:0;border-left:1.5px solid #aaa;height:.7em"></div>
+                <div style="position:absolute;top:1em;left:50%;width:0;border-left:1.5px solid #aaa;height:.7em;transform:translateX(-50%)"></div>
+                <div style="position:absolute;top:1em;right:1.5em;width:0;border-left:1.5px solid #aaa;height:.7em"></div>
+            </div>
+            <div style="display:flex;gap:.7em;margin-top:1.8em">
+                <div style="background:#e3f2fd;border:1px solid #90caf9;border-radius:4px;padding:.35em .85em;text-align:center">視覺</div>
+                <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:.35em .85em;text-align:center">觸覺</div>
+                <div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:4px;padding:.35em .85em;text-align:center">聽覺</div>
             </div>
         </div>
-        <div style="display:flex;align-items:center;padding:0 .8em;font-size:1.4em;color:#666">→</div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:.4em">
-            <div style="background:#2e7d32;color:#fff;border-radius:8px;padding:.55em 1.8em;font-size:.88em;font-weight:600;text-align:center">
-                學習媒介評量
-            </div>
-            <div style="font-size:.78em;color:#2e7d32;border:1.5px solid #2e7d32;border-radius:6px;padding:.35em 1.2em;text-align:center;background:#e8f5e9">
-                尋找最適的閱讀書寫方式
-            </div>
+        <!-- 右側回饋箭頭 -->
+        <div style="display:flex;flex-direction:column;align-items:center;padding-top:1em;min-height:14em">
+            <div style="font-size:.78em;color:#666;text-align:center;white-space:nowrap;line-height:1.5">教學後<br>重新評估</div>
+            <div style="flex:1;border-left:1.5px solid #aaa;margin:.3em 0"></div>
+            <div style="font-size:1.3em;color:#aaa;line-height:1">↑</div>
         </div>
-    </div>
-    <div style="text-align:center;font-size:1.3em;color:#666;margin:.3em 0">↓</div>
-    <div style="display:flex;justify-content:center;gap:1em;align-items:stretch">
-        <div style="font-size:.78em;font-weight:600;color:#555;display:flex;align-items:center;padding-right:.5em">最佳感官能力</div>
-        <div style="background:#e3f2fd;border-radius:6px;padding:.4em 1.2em;font-size:.82em;border:1px solid #90caf9">視覺</div>
-        <div style="background:#e8f5e9;border-radius:6px;padding:.4em 1.2em;font-size:.82em;border:1px solid #a5d6a7">觸覺</div>
-        <div style="background:#fff3e0;border-radius:6px;padding:.4em 1.2em;font-size:.82em;border:1px solid #ffcc80">聽覺</div>
-    </div>
-    <div style="text-align:center;font-size:.78em;color:#666;margin:.5em 0;padding:.4em 1.5em;border-top:1px dashed #ccc">
-        教學後定期重新評估
     </div>
 </section>
 
