@@ -100,9 +100,9 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
     margin: .85em 0 .18em; padding-bottom: .15em; border-bottom: 1px solid #eceff1; }
 .idx-table { width: 100%; border-collapse: collapse; font-size: .79em; }
 .idx-table tr { cursor: pointer; }
-.idx-table tr.idx-selected td { background: #e8f5e9; }
-.idx-table tr:hover td, .idx-table tr.idx-active td { background: #e8f0fe; }
-.idx-table tr.idx-selected:hover td, .idx-table tr.idx-selected.idx-active td { background: #c8e6c9; }
+.idx-table tr.idx-checked td { background: #e8f5e9; }
+.idx-table tr:hover td { background: #f0f4f8; }
+.idx-table tr.idx-checked:hover td { background: #c8e6c9; }
 .idx-table td { padding: .2em .45em .2em 0; vertical-align: middle; }
 .idx-id { font-family: "Consolas","Courier New",monospace; color: #1565c0; white-space: nowrap; }
 .idx-name { color: #333; width: 100%; }
@@ -456,7 +456,7 @@ MODULES.forEach(m => {
                 if (memberCb) memberCb.checked = this.checked;
             });
             syncGroupSelectAll(m.group);
-            syncUrl(); syncIdxSelection();
+            syncUrl();
         });
     } else {
         const label = document.createElement('label');
@@ -485,13 +485,13 @@ groupIds.forEach(grp => {
         document.querySelectorAll(`#content-${grp} input[name=mod]`).forEach(cb => {
             cb.checked = sa.checked;
         });
-        syncUrl(); syncIdxSelection();
+        syncUrl();
     });
 
     document.getElementById('content-' + grp).addEventListener('change', e => {
         if (e.target.name !== 'mod') return;
         syncGroupSelectAll(grp);
-        syncUrl(); syncIdxSelection();
+        syncUrl();
     });
 });
 
@@ -749,16 +749,6 @@ initDragDrop();
     }
 })();
 
-// ── 左欄勾選同步右欄高亮 ──────────────────────────────────
-const _idxRowMap = {};
-function syncIdxSelection() {
-    const checked = new Set(
-        Array.from(document.querySelectorAll('input[name="mod"]:checked')).map(c => c.value)
-    );
-    Object.entries(_idxRowMap).forEach(([id, tr]) => {
-        tr.classList.toggle('idx-selected', checked.has(id));
-    });
-}
 
 // ── Modal 事件 ────────────────────────────────────────────
 document.getElementById('mod-modal').addEventListener('click', e => {
@@ -767,17 +757,21 @@ document.getElementById('mod-modal').addEventListener('click', e => {
 document.getElementById('mod-modal-close').addEventListener('click', closeModal);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// ── 右欄模組索引表 ────────────────────────────────────────
-(function buildModIndex() {
+// ── 右欄 JS 模組列表（可勾選匯出） ───────────────────────
+(function buildJsModList() {
     const panel = document.getElementById('idx-panel-body');
     if (!panel) return;
     const groupLabel = {
         vitools: 'vi-tools 工具', nvda: 'NVDA 附加元件',
         viat: '視障生學習與輔助科技', ueb: 'UEB 規則介紹',
-        promo: '宣導簡報', lxb: '學分班', common: '共用頁面',
+        promo: '宣導簡報', common: '共用頁面',
     };
-    let curGroup = null, tbody = null, activeRow = null;
+    const seen = new Set();
+    let curGroup = null, tbody = null;
     MODULES.forEach(m => {
+        if (m.group === 'lxb') return;
+        if (seen.has(m.id)) return;
+        seen.add(m.id);
         if (m.group !== curGroup) {
             curGroup = m.group;
             const h = document.createElement('div');
@@ -790,21 +784,37 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
             tbl.appendChild(tbody);
             panel.appendChild(tbl);
         }
-        const srcId = MODULES_SRC[m.id] || m.id;
         const tr = document.createElement('tr');
-        tr.title = '點擊預覽';
-        const tdId   = document.createElement('td'); tdId.className = 'idx-id';   tdId.textContent = srcId;
-        const tdName = document.createElement('td'); tdName.className = 'idx-name'; tdName.textContent = m.name;
-        tr.append(tdId, tdName);
-        tr.addEventListener('click', () => {
-            if (activeRow) activeRow.classList.remove('idx-active');
-            activeRow = tr; tr.classList.add('idx-active');
-            openModal(m.id);
+        const tdCb = document.createElement('td');
+        tdCb.style.cssText = 'width:18px;padding-right:.3em';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.name = 'mod'; cb.value = m.id;
+        cb.addEventListener('change', () => {
+            tr.classList.toggle('idx-checked', cb.checked);
+            syncUrl();
         });
-        _idxRowMap[m.id] = tr;
+        tdCb.appendChild(cb);
+        const tdId   = document.createElement('td'); tdId.className = 'idx-id';   tdId.textContent = m.id;
+        const tdName = document.createElement('td'); tdName.className = 'idx-name'; tdName.textContent = m.name;
+        const tdBtn  = document.createElement('td');
+        const btn = document.createElement('button');
+        btn.className = 'mod-preview'; btn.type = 'button';
+        btn.textContent = '▶'; btn.title = '預覽';
+        btn.addEventListener('click', e => { e.stopPropagation(); openModal(m.id); });
+        tdBtn.appendChild(btn);
+        tr.addEventListener('click', e => {
+            if (e.target === cb || e.target === btn) return;
+            cb.checked = !cb.checked;
+            cb.dispatchEvent(new Event('change'));
+        });
+        tr.append(tdCb, tdId, tdName, tdBtn);
         tbody.appendChild(tr);
     });
-    syncIdxSelection();
+    // 從 URL 恢復右欄勾選狀態
+    const urlIds = new Set((new URLSearchParams(location.search).get('m') || '').split(',').filter(Boolean));
+    panel.querySelectorAll('input[name=mod]').forEach(c => {
+        if (urlIds.has(c.value)) { c.checked = true; c.closest('tr').classList.add('idx-checked'); }
+    });
 })();
 </script>
 </body>
