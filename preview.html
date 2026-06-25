@@ -37,16 +37,21 @@
 }
 #toc-close:hover { background: rgba(255,255,255,.25); }
 #toc-list { list-style: none; padding: 0; margin: 0; }
+#toc-list li { display: flex; align-items: stretch; border-bottom: 1px solid #f0f0f0; }
 #toc-list button {
-    display: flex; align-items: baseline; gap: 8px; width: 100%;
-    text-align: left; padding: 8px 14px;
-    border: none; border-bottom: 1px solid #f0f0f0;
-    background: none; cursor: pointer;
+    display: flex; align-items: baseline; gap: 8px; flex: 1;
+    text-align: left; padding: 8px 14px 8px 0;
+    border: none; background: none; cursor: pointer;
     font-size: .82em; font-family: inherit; line-height: 1.45;
 }
 #toc-list button:hover { background: #e8f5e9; }
 #toc-list button.toc-current { background: #e8f5e9; font-weight: 700; color: #1b5e20; }
 .toc-num { color: #aaa; font-size: .85em; min-width: 2.4em; flex-shrink: 0; }
+.toc-drag { display: flex; align-items: center; color: #bbb; cursor: grab; padding: 0 4px 0 10px; user-select: none; flex-shrink: 0; font-size: 1em; }
+.toc-drag:hover { color: #666; }
+#toc-list li.toc-dragging button { opacity: .4; }
+#toc-list li.drag-over-top { box-shadow: 0 -2px 0 #1565c0; }
+#toc-list li.drag-over-bottom { box-shadow: 0 2px 0 #1565c0; }
 /* lightbox */
 #img-lightbox {
     display: none;
@@ -110,7 +115,14 @@ if (!modIds.length) {
             .then(r => r.ok ? r.text() : `<section><p style="color:red">模組 ${id} 載入失敗</p></section>`)
             .catch(() => `<section><p style="color:red">模組 ${id} 載入失敗</p></section>`)
     )).then(htmls => {
-        container.innerHTML = htmls.join('\n');
+        container.innerHTML = htmls.map((html, mi) => {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            tmp.querySelectorAll('section').forEach(s => { s.dataset.modId = modIds[mi]; });
+            return tmp.innerHTML;
+        }).join('\n');
+        let _si = 0;
+        container.querySelectorAll('section').forEach(s => { s.dataset.secIdx = _si++; });
 
         const slides = Array.from(container.querySelectorAll('section'));
         slides.forEach((sec, i) => {
@@ -184,21 +196,102 @@ function initTOC() {
     const list = document.getElementById('toc-list');
     const closeBtn = document.getElementById('toc-close');
 
-    const sections = Array.from(container.querySelectorAll('section'));
-    sections.forEach((sec, i) => {
-        const h2 = sec.querySelector('h2');
+    Array.from(container.querySelectorAll('section')).forEach((sec, i) => {
         const ariaLabel = sec.getAttribute('aria-label') || '';
+        const h2 = sec.querySelector('h2');
         const title = ariaLabel || (h2 ? h2.textContent.trim() : `第 ${i + 1} 頁`);
 
         const li = document.createElement('li');
+        li.draggable = true;
+        li.dataset.secIdx = sec.dataset.secIdx;
+
+        const handle = document.createElement('span');
+        handle.className = 'toc-drag';
+        handle.textContent = '⠿';
+        handle.setAttribute('aria-hidden', 'true');
+        handle.addEventListener('mousedown', () => { _tocDragAllowed = true; });
+        handle.addEventListener('click', e => e.stopPropagation());
+
         const b = document.createElement('button');
         b.innerHTML = `<span class="toc-num">${i + 1}</span><span>${title}</span>`;
         b.addEventListener('click', () => {
-            Reveal.slide(i);
+            Reveal.slide(Array.from(list.querySelectorAll('li')).indexOf(li));
         });
-        li.appendChild(b);
+
+        li.append(handle, b);
         list.appendChild(li);
     });
+
+    // drag state
+    let _tocDragAllowed = false, _tocDragEl = null;
+    document.addEventListener('mouseup', () => { _tocDragAllowed = false; });
+
+    function clearTocIndicators() {
+        list.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el =>
+            el.classList.remove('drag-over-top', 'drag-over-bottom'));
+    }
+    function liAtY(y) {
+        return document.elementFromPoint(list.getBoundingClientRect().left + 4, y)?.closest('#toc-list li') || null;
+    }
+    function renumber() {
+        list.querySelectorAll('li').forEach((li, i) => {
+            li.querySelector('.toc-num').textContent = i + 1;
+        });
+    }
+    function updateModUrl() {
+        const mods = [], seen = new Set();
+        container.querySelectorAll('section[data-mod-id]').forEach(s => {
+            if (!seen.has(s.dataset.modId)) { seen.add(s.dataset.modId); mods.push(s.dataset.modId); }
+        });
+        const url = new URL(location.href);
+        url.searchParams.set('m', mods.join(','));
+        history.replaceState(null, '', url);
+    }
+
+    list.addEventListener('dragstart', e => {
+        if (!_tocDragAllowed) { e.preventDefault(); return; }
+        _tocDragEl = e.target.closest('#toc-list li');
+        if (!_tocDragEl) return;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', '');
+        requestAnimationFrame(() => _tocDragEl && _tocDragEl.classList.add('toc-dragging'));
+    });
+    list.addEventListener('dragover', e => {
+        if (!_tocDragEl) return;
+        e.preventDefault();
+        clearTocIndicators();
+        const over = liAtY(e.clientY);
+        if (!over || over === _tocDragEl) return;
+        const r = over.getBoundingClientRect();
+        over.classList.add(e.clientY < r.top + r.height / 2 ? 'drag-over-top' : 'drag-over-bottom');
+    });
+    list.addEventListener('dragleave', e => {
+        if (e.relatedTarget && list.contains(e.relatedTarget)) return;
+        clearTocIndicators();
+    });
+    list.addEventListener('drop', e => {
+        e.preventDefault();
+        const over = liAtY(e.clientY);
+        clearTocIndicators();
+        if (!over || over === _tocDragEl) { endTocDrag(); return; }
+        const r = over.getBoundingClientRect();
+        const before = e.clientY < r.top + r.height / 2;
+        // move li
+        list.insertBefore(_tocDragEl, before ? over : over.nextSibling);
+        // move section
+        const dragSec = container.querySelector(`section[data-sec-idx="${_tocDragEl.dataset.secIdx}"]`);
+        const overSec = container.querySelector(`section[data-sec-idx="${over.dataset.secIdx}"]`);
+        if (dragSec && overSec) container.insertBefore(dragSec, before ? overSec : overSec.nextSibling);
+        renumber();
+        updateModUrl();
+        Reveal.sync();
+        endTocDrag();
+    });
+    list.addEventListener('dragend', () => { clearTocIndicators(); endTocDrag(); });
+    function endTocDrag() {
+        if (_tocDragEl) _tocDragEl.classList.remove('toc-dragging');
+        _tocDragEl = null; _tocDragAllowed = false;
+    }
 
     function openTOC() {
         panel.hidden = false;

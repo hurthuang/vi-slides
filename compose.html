@@ -666,6 +666,16 @@ function childAtY(content, y) {
     }) || null;
 }
 
+function trAtY(panel, y) {
+    for (const tbl of panel.querySelectorAll('.idx-table')) {
+        for (const row of tbl.querySelectorAll('tr')) {
+            const r = row.getBoundingClientRect();
+            if (y >= r.top && y <= r.bottom) return row;
+        }
+    }
+    return null;
+}
+
 function chapterGroup(content, child) {
     if (!child.classList.contains('ch-row')) return [child];
     const result = [child];
@@ -785,6 +795,11 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
             panel.appendChild(tbl);
         }
         const tr = document.createElement('tr');
+        tr.draggable = true;
+        const tdH = document.createElement('td');
+        tdH.textContent = '⠿';
+        tdH.style.cssText = 'color:#ccc;cursor:grab;padding:0 .3em;user-select:none;font-size:1em';
+        tdH.addEventListener('mousedown', e => { _dragAllowed = true; e.stopPropagation(); });
         const tdCb = document.createElement('td');
         tdCb.style.cssText = 'width:18px;padding-right:.3em';
         const cb = document.createElement('input');
@@ -803,11 +818,11 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
         btn.addEventListener('click', e => { e.stopPropagation(); openModal(m.id); });
         tdBtn.appendChild(btn);
         tr.addEventListener('click', e => {
-            if (e.target === cb || e.target === btn) return;
+            if (e.target === cb || e.target === btn || e.target === tdH) return;
             cb.checked = !cb.checked;
             cb.dispatchEvent(new Event('change'));
         });
-        tr.append(tdCb, tdId, tdName, tdBtn);
+        tr.append(tdH, tdCb, tdId, tdName, tdBtn);
         tbody.appendChild(tr);
     });
     // 從 URL 恢復右欄勾選狀態
@@ -815,6 +830,47 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
     panel.querySelectorAll('input[name=mod]').forEach(c => {
         if (urlIds.has(c.value)) { c.checked = true; c.closest('tr').classList.add('idx-checked'); }
     });
+
+    // ── 右欄拖曳排序 ──────────────────────────────────────
+    let _idxDragEl = null;
+    panel.addEventListener('dragstart', e => {
+        if (!_dragAllowed) { e.preventDefault(); return; }
+        _idxDragEl = e.target.closest('#idx-panel-body tr');
+        if (!_idxDragEl) return;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', '');
+        requestAnimationFrame(() => _idxDragEl && _idxDragEl.classList.add('dragging'));
+    });
+    panel.addEventListener('dragover', e => {
+        if (!_idxDragEl) return;
+        e.preventDefault();
+        clearDragIndicators(panel);
+        const over = trAtY(panel, e.clientY);
+        if (!over || over === _idxDragEl) return;
+        const rect = over.getBoundingClientRect();
+        over.classList.add(e.clientY < rect.top + rect.height / 2 ? 'drag-over-top' : 'drag-over-bottom');
+    });
+    panel.addEventListener('dragleave', e => {
+        if (e.relatedTarget && panel.contains(e.relatedTarget)) return;
+        clearDragIndicators(panel);
+    });
+    panel.addEventListener('drop', e => {
+        e.preventDefault();
+        const over = trAtY(panel, e.clientY);
+        clearDragIndicators(panel);
+        if (over && over !== _idxDragEl) {
+            const tb = over.closest('tbody');
+            const rect = over.getBoundingClientRect();
+            tb.insertBefore(_idxDragEl, e.clientY < rect.top + rect.height / 2 ? over : over.nextSibling);
+            syncUrl();
+        }
+        endIdxDrag();
+    });
+    panel.addEventListener('dragend', () => { clearDragIndicators(panel); endIdxDrag(); });
+    function endIdxDrag() {
+        if (_idxDragEl) _idxDragEl.classList.remove('dragging');
+        _idxDragEl = null; _dragAllowed = false;
+    }
 })();
 </script>
 </body>
