@@ -570,7 +570,7 @@ function syncRightColChecks() {
     });
 }
 document.getElementById('compose-left').addEventListener('change', e => {
-    if (e.target.name === 'mod') syncRightColChecks();
+    if (e.target.type === 'checkbox') syncRightColChecks();
 });
 
 // ── 按鈕邏輯 ─────────────────────────────────────────────
