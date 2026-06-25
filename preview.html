@@ -115,12 +115,18 @@ if (!modIds.length) {
             .then(r => r.ok ? r.text() : `<section><p style="color:red">模組 ${id} 載入失敗</p></section>`)
             .catch(() => `<section><p style="color:red">模組 ${id} 載入失敗</p></section>`)
     )).then(htmls => {
+        const titleParam = params.get('title');
         container.innerHTML = htmls.map((html, mi) => {
             const tmp = document.createElement('div');
             tmp.innerHTML = html;
             tmp.querySelectorAll('section').forEach(s => { s.dataset.modId = modIds[mi]; });
             return tmp.innerHTML;
         }).join('\n');
+        if (titleParam) {
+            container.querySelectorAll('[data-title-slot]').forEach(el => {
+                el.textContent = titleParam;
+            });
+        }
         let _si = 0;
         container.querySelectorAll('section').forEach(s => { s.dataset.secIdx = _si++; });
 

@@ -109,6 +109,11 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 .pdf-hint { font-size: .8em; color: #888; margin-top: .9em; padding: .6em .8em;
     background: #fff8e1; border-radius: 6px; border-left: 3px solid #ffd54f; line-height: 1.5; }
 #status { font-size: .85em; color: #555; padding: .4em 0; }
+#title-row { display: flex; align-items: center; gap: .5em; margin-bottom: 1.2em; }
+#title-row label { font-size: .85em; color: #555; white-space: nowrap; }
+#input-title { flex: 1; padding: .42em .7em; border: 1px solid #bbb; border-radius: 6px;
+    font-size: .92em; font-family: inherit; }
+#input-title:focus { outline: 2px solid #1565c0; border-color: #1565c0; }
 </style>
 </head>
 <body>
@@ -116,6 +121,11 @@ button { padding: .55em 1.3em; border: none; border-radius: 6px; cursor: pointer
 <div id="compose-left">
 <h1>vi-slides 簡報組合器</h1>
 <p class="subtitle">勾選要放入的模組，按「預覽簡報」直接開啟，或複製連結分享講義。</p>
+
+<div id="title-row">
+    <label for="input-title">演講主題</label>
+    <input id="input-title" type="text" placeholder="留空則使用模組預設標題">
+</div>
 
 <div id="groups-container">
 
@@ -516,12 +526,19 @@ function getSelected() {
 }
 function buildPreviewUrl(selected) {
     const base = location.href.split('?')[0].replace('compose.html', 'preview.html');
-    return base + '?m=' + selected.join(',');
+    const title = document.getElementById('input-title').value.trim();
+    let url = base + '?m=' + selected.join(',');
+    if (title) url += '&title=' + encodeURIComponent(title);
+    return url;
 }
 function syncUrl() {
     const sel = getSelected();
-    const newUrl = sel.length ? '?m=' + sel.join(',') : location.pathname.split('/').pop();
-    history.replaceState(null, '', newUrl);
+    const title = document.getElementById('input-title').value.trim();
+    const p = new URLSearchParams();
+    if (sel.length) p.set('m', sel.join(','));
+    if (title) p.set('title', title);
+    const q = p.toString();
+    history.replaceState(null, '', q ? '?' + q : location.pathname.split('/').pop());
 }
 function restoreFromUrl() {
     const params = new URLSearchParams(location.search);
@@ -552,8 +569,11 @@ function restoreFromUrl() {
         });
     }
     groupIds.forEach(syncGroupSelectAll);
+    const t = params.get('title');
+    if (t) document.getElementById('input-title').value = t;
 }
 restoreFromUrl();
+document.getElementById('input-title').addEventListener('input', syncUrl);
 
 // ── 左欄勾選同步右欄 ──────────────────────────────────────
 function syncRightColChecks() {
