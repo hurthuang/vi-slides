@@ -555,6 +555,24 @@ function restoreFromUrl() {
 }
 restoreFromUrl();
 
+// ── 左欄勾選同步右欄 ──────────────────────────────────────
+function syncRightColChecks() {
+    const sel = new Set();
+    document.querySelectorAll('#compose-left input[name=mod]:checked').forEach(el => {
+        sel.add(MODULES_SRC[el.value] || el.value);
+    });
+    document.querySelectorAll('#idx-panel-body input[name=mod]').forEach(cb => {
+        const newState = sel.has(MODULES_SRC[cb.value] || cb.value);
+        if (cb.checked !== newState) {
+            cb.checked = newState;
+            cb.closest('tr').classList.toggle('idx-checked', newState);
+        }
+    });
+}
+document.getElementById('compose-left').addEventListener('change', e => {
+    if (e.target.name === 'mod') syncRightColChecks();
+});
+
 // ── 按鈕邏輯 ─────────────────────────────────────────────
 const statusEl = document.getElementById('status');
 function showStatus(msg, ms = 2500) {
