@@ -122,10 +122,10 @@ if (!modIds.length) {
             tmp.querySelectorAll('section').forEach(s => { s.dataset.modId = modIds[mi]; });
             return tmp.innerHTML;
         }).join('\n');
-        if (titleParam) {
-            container.querySelectorAll('[data-title-slot]').forEach(el => {
-                el.textContent = titleParam;
-            });
+        const titleSlots = Array.from(container.querySelectorAll('section:has([data-title-slot])'));
+        if (titleSlots.length > 0) {
+            if (titleParam) titleSlots[0].querySelector('[data-title-slot]').textContent = titleParam;
+            titleSlots.slice(1).forEach(s => s.remove());
         }
         let _si = 0;
         container.querySelectorAll('section').forEach(s => { s.dataset.secIdx = _si++; });
