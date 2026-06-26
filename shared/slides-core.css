@@ -45,13 +45,13 @@
 
 /* ── 標題頁 ── */
 .slide-cover {
-    background: linear-gradient(140deg, #1b5e20 0%, #2e7d32 55%, #004d40 100%) !important;
+    background: linear-gradient(140deg, #3a5068 0%, #546e7a 55%, #607b6c 100%) !important;
     color: #fff !important;
     display: flex; flex-direction: column; justify-content: center;
 }
-.slide-cover h1 { color: #fff !important; font-size: 2em; line-height: 1.15; margin: 0 0 .2em; }
-.slide-cover .tagline { color: #c8e6c9; font-size: .76em; margin: 0; }
-.slide-cover .presenter { margin-top: 1em; color: #a5d6a7; font-size: .74em; line-height: 1.9; border-top: 1px solid rgba(255,255,255,.2); padding-top: .8em; }
+.slide-cover h1 { color: #fff !important; font-size: 1.6em; line-height: 1.2; margin: 0 0 .2em; white-space: nowrap; }
+.slide-cover .tagline { color: #bbdefb; font-size: .76em; margin: 0; }
+.slide-cover .presenter { margin-top: 1em; color: #bbdefb; font-size: .74em; line-height: 1.9; border-top: 1px solid rgba(255,255,255,.2); padding-top: .8em; }
 .slide-cover .url { margin-top: .8em; background: rgba(255,255,255,.15); display: inline-block; padding: .28em .8em; border-radius: 5px; font-size: .7em; }
 .slide-cover .url a { color: #fff; text-decoration: none; }
 
